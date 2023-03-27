@@ -5,9 +5,16 @@ function sendForm(form) {
     if (skin_types[i].checked)
       skin_type = skin_types[i];
   }
+  var product_types = document.getElementsByName('skin_type');
+  var skin_type = null;
+  for (i = 0; i < product_types.length; i++) {
+    if (product_types[i].checked)
+      product_type = product_types[i];
+  }
   let allergies = document.getElementById("allergies");
   console.log(skin_type);
   console.log(allergies.value);
+
   // pass to python function to get results
 }
 
@@ -25,7 +32,7 @@ function displayProducts(name) {
 
 function answerBoxTemplate(name, url) {
   return `<div class=''>
-      <h3 class='product-name'>${name}</h3>
-      <p class='product-url'>${url}</p>
-  </div>`
+<h3 class='product-name'>${name}</h3>
+<p class='product-url'>${url}</p>
+</div>`
 }
