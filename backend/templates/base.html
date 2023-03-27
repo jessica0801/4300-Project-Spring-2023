@@ -17,34 +17,27 @@
             <div class="google-colors">
                 <h3 id="google-c">let's get to know you</h3>
             </div>
-            <div class="full-body-container">
-                <div class="top-text">
-                    <div class="google-colors">
-                        <h1 id="google-c">cosMEtics</h1>
-                    </div>
-                    <form>
-                        <p>What type of product are you looking for?</p>
-                        <div class="radio">
-                            <input type="radio" id="moisturiser" name="product_type" value="moisturiser">
-                            <label for="moisturiser">moisturiser</label>
-                            <input type="radio" id="serum" name="product_type" value="serum">
-                            <label for="serum">serum</label>
-                            <input type="radio" id="oil" name="product_type" value="oil">
-                            <label for="oil">oil</label>
-                            <input type="radio" id="mist" name="product_type" value="mist">
-                            <label for="mist">mist</label>
-                            <input type="radio" id="balm" name="product_type" value="balm">
-                            <label for="balm">balm</label>
-                        </div>
-                        <p>Do you have any allergies?
-                        </p>
-                        <input class="input-box" type="text" id="allergies" name="allergies"
-                            placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br>
-                        <input class="button" type="submit" name="submit" value="submit" onSubmit="sendForm(this.form)">
-                    </form>
+            <form class="form">
+                <p>What type of product are you looking for?</p>
+                <div class="radio">
+                    <input type="radio" id="moisturiser" name="product_type" value="moisturiser">
+                    <label for="moisturiser">moisturiser</label>
+                    <input type="radio" id="serum" name="product_type" value="serum">
+                    <label for="serum">serum</label>
+                    <input type="radio" id="oil" name="product_type" value="oil">
+                    <label for="oil">oil</label>
+                    <input type="radio" id="mist" name="product_type" value="mist">
+                    <label for="mist">mist</label>
+                    <input type="radio" id="balm" name="product_type" value="balm">
+                    <label for="balm">balm</label><br>
                 </div>
-                <div id="answer-box"></div>
-            </div>
+                <p>Do you have any allergies?
+                </p>
+                <input class="input-box" type="text" id="allergies" name="allergies"
+                    placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br>
+                <input class="button" type="submit" name="submit" value="submit" onSubmit="sendForm(this.form)">
+            </form>
         </div>
+        <div id="answer-box"></div>
     </div>
 </body>
