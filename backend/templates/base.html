@@ -18,23 +18,39 @@
             <div class="google-colors">
                 <h3 id="google-c">let's get to know you</h3>
             </div>
-            <form class="form">
-                <p>What kind of skin do you have?</p>
-                <div class="radio">
-                    <input type="radio" id="normal" name="skin_type" value="normal">
-                    <label for="normal">normal</label>
-                    <input type="radio" id="dry" name="skin_type" value="dry">
-                    <label for="dry">dry</label>
-                    <input type="radio" id="oily" name="skin_type" value="oily">
-                    <label for="oily">oily</label>
-                    <input type="radio" id="combination" name="skin_type" value="combination">
-                    <label for="combination">combination</label>
-                    <input type="radio" id="sensitive" name="skin_type" value="sensitive">
-                    <label for="sensitive">sensitive</label>
-                    <input type="radio" id="other" name="skin_type" value="other">
-                    <label for="other">other</label><br>
-                </div>
-                <p>Do you have any allergies?
+            <!-- <form>
+                <p>What type of skin do you have?</p>
+                <input type="radio" id="normal" name="skin_type" value="normal">
+                <label for="normal">Normal</label><br>
+                <input type="radio" id="dry" name="skin_type" value="dry">
+                <label for="dry">Dry</label><br>
+                <input type="radio" id="oily" name="skin_type" value="oily">
+                <label for="oily">Oily</label><br>
+                <input type="radio" id="combination" name="skin_type" value="combination">
+                <label for="combination">Combination</label><br>
+                <input type="radio" id="sensitive" name="skin_type" value="sensitive">
+                <label for="sensitive">Sensitive</label><br>
+                <input type="radio" id="other" name="skin_type" value="other">
+                <label for="other">Other</label><br>
+                <p>Do you have any allergies? (E.g. natural rubber, natural fragrances, preservatives, dyes, or metals)
+                </p>
+                <input type="text" id="allergies" name="allergies"><br>
+                <input type="submit" name="submit" value="submit" onSubmit="sendForm(this.form)">
+            </form> -->
+            <form>
+                <p>What type of product are you looking for?</p>
+                <input type="radio" id="moisturiser" name="product_type" value="moisturiser">
+                <label for="moisturiser">Moisturiser</label><br>
+                <input type="radio" id="serum" name="product_type" value="serum">
+                <label for="serum">Serum</label><br>
+                <input type="radio" id="oil" name="product_type" value="oil">
+                <label for="serum">Oil</label><br>
+                <input type="radio" id="mist" name="product_type" value="mist">
+                <label for="mist">Mist</label><br>
+                <input type="radio" id="balm" name="product_type" value="balm">
+                <label for="balm">Balm</label><br>
+
+                <p>Do you have any allergies? (E.g. natural rubber, natural fragrances, preservatives, dyes, or metals)
                 </p>
                 <input class="input-box" type="text" id="allergies" name="allergies"
                     placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br>
@@ -43,4 +59,38 @@
         </div>
         <div id="answer-box"></div>
     </div>
+
+    <script>
+        function sendForm(form) {
+            var skin_types = document.getElementsByName('skin_type');
+            var skin_type = null;
+            for (i = 0; i < skin_types.length; i++) {
+                if (skin_types[i].checked)
+                    skin_type = skin_types[i];
+            }
+            let allergies = document.getElementById("allergies");
+            console.log(skin_type);
+            console.log(allergies.value);
+            // pass to python function to get results
+        }
+
+        function displayProducts(name) {
+            document.getElementById("answer-box").innerHTML = ""
+            fetch("/products?" + new URLSearchParams({ product_name: name }).toString())
+                .then((response) => response.json())
+                .then((data) => data.forEach(row => {
+
+                    let tempDiv = document.createElement("div")
+                    tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_url)
+                    document.getElementById("answer-box").appendChild(tempDiv)
+                }));
+        }
+
+        function answerBoxTemplate(name, url) {
+            return `<div class=''>
+                <h3 class='product-name'>${name}</h3>
+                <p class='product-url'>${url}</p>
+            </div>`
+        }
+    </script>
 </body>
