@@ -12,7 +12,7 @@
             <div class="google-colors">
                 <h1 id="google-c">cosMEtics</h1>
             </div>
-            <form>
+            <!-- <form>
                 <p>What type of skin do you have?</p>
                 <input type="radio" id="normal" name="skin_type" value="normal">
                 <label for="normal">Normal</label><br>
@@ -26,6 +26,24 @@
                 <label for="sensitive">Sensitive</label><br>
                 <input type="radio" id="other" name="skin_type" value="other">
                 <label for="other">Other</label><br>
+                <p>Do you have any allergies? (E.g. natural rubber, natural fragrances, preservatives, dyes, or metals)
+                </p>
+                <input type="text" id="allergies" name="allergies"><br>
+                <input type="submit" name="submit" value="submit" onSubmit="sendForm(this.form)">
+            </form> -->
+            <form>
+                <p>What type of product are you looking for?</p>
+                <input type="radio" id="moisturiser" name="product_type" value="moisturiser">
+                <label for="moisturiser">Moisturiser</label><br>
+                <input type="radio" id="serum" name="product_type" value="serum">
+                <label for="serum">Serum</label><br>
+                <input type="radio" id="oil" name="product_type" value="oil">
+                <label for="serum">Oil</label><br>
+                <input type="radio" id="mist" name="product_type" value="mist">
+                <label for="mist">Mist</label><br>
+                <input type="radio" id="balm" name="product_type" value="balm">
+                <label for="balm">Balm</label><br>
+
                 <p>Do you have any allergies? (E.g. natural rubber, natural fragrances, preservatives, dyes, or metals)
                 </p>
                 <input type="text" id="allergies" name="allergies"><br>
@@ -45,9 +63,16 @@
                 if (skin_types[i].checked)
                     skin_type = skin_types[i];
             }
+            var product_types = document.getElementsByName('skin_type');
+            var skin_type = null;
+            for (i = 0; i < product_types.length; i++) {
+                if (product_types[i].checked)
+                    product_type = product_types[i];
+            }
             let allergies = document.getElementById("allergies");
             console.log(skin_type);
             console.log(allergies.value);
+
             // pass to python function to get results
         }
 

@@ -23,7 +23,7 @@ mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
 
 # Path to init.sql file. This file can be replaced with your own file for testing on localhost, but do NOT move the init.sql file
 mysql_engine.load_file_into_db()
-
+products = list(mysql_engine.query_selector(f"SELECT * FROM productinfo"))
 app = Flask(__name__)
 CORS(app)
 
@@ -102,6 +102,28 @@ def boolean_search1(product):
 
     return json.dumps([dict(zip(keys, i)) for i in data])
 
+def product_filter(product_type):
+    keys = ["id","product_url","product_type","product_price"]
+
+    product_type = f"SELECT * FROM productinfo WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%'"
+    query1 = mysql_engine.query_selector(product_type)
+
+    return json.dumps([dict(zip(keys,i)) for i in query1])
+
+def price_filter(product_price):
+    price = float(product_price)
+    keys = ["id","product_url","product_type","product_price"]
+
+    product_price = f"SELECT * FROM productinfo WHERE CAST(product_price as decimal(5,2)) BETWEEN '%%{price*0.5}%%' AND '%%{price*1.5}%%'"
+    query2 = mysql_engine.query_selector(product_price)
+
+    return json.dumps([dict(zip(keys,i)) for i in query2])
+
+# product = products[2]
+# print(product)
+# print(product_filter(product[3]))
+# # print(product[1])
+# # print(price_filter(product[4]))
 
 @app.route("/")
 def home():
@@ -113,5 +135,10 @@ def products_search():
     text = request.args.get("product_name")
     return boolean_search1(text)
 
+@app.route("/product-type")
+def product_type_search():
+    text = request.args.get("product_type")
+    return product_filter(text)
 
-# app.run(debug=True)
+
+app.run(debug=True)
