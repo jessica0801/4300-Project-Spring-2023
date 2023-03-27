@@ -79,15 +79,16 @@ def price_filter(product_price):
     price = float(product_price)
     keys = ["id","product_url","product_type","product_price"]
 
-    product_price = f"SELECT * FROM productinfo WHERE CAST(product_price as decimal(4,2)) BETWEEN '%%{price*0.5}%%' AND '%%{price*1.5}%%'"
+    product_price = f"SELECT * FROM productinfo WHERE CAST(product_price as decimal(5,2)) BETWEEN '%%{price*0.5}%%' AND '%%{price*1.5}%%'"
     query2 = mysql_engine.query_selector(product_price)
 
     return json.dumps([dict(zip(keys,i)) for i in query2])
 
-product = products[72]
+product = products[2]
 # print(product)
 # print(product_filter(product[2]))
-print(price_filter(product[3]))
+print(product[1])
+# print(price_filter(product[4]))
 
 @app.route("/")
 def home():
