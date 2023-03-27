@@ -1,5 +1,7 @@
 import json
 import os
+import numpy as np
+import ast
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
@@ -39,6 +41,57 @@ def sql_search(product):
     data = mysql_engine.query_selector(query_sql)
     return json.dumps([dict(zip(keys, i)) for i in data])
 
+def getSkinType(skin):
+    # 14 product types: moisturizer, serum, oil, mist, balm, mask, peel, eye care, 
+    # cleanser, toner, exfoliater, bath salts, body wash, bath oil
+    product_types = []
+
+    if skin_type == 'normal' or skin_type == 'combination':
+        product_type = ['moisturizer', 'serum', 'oil', 'mist', 'balm', 'mask', 'peel', 'cleanser', 'toner', 'exfoliater']
+    elif skin_type == 'dry':
+        product_type = ['moisturizer','serum', 'oil', 'mist', 'balm', 'mask']
+    elif skin_type == 'oily':
+        product_type = ['mist', 'peel', 'cleanser', 'toner', 'exfoliater']
+    elif skin_type == 'sensitive':
+        product_type = ['moisturizer', 'serum','mist', 'cleanser', 'toner', 'mask']
+    else:
+        product_type = ['eye care', 'bath salts', 'body wash', 'bath oil']
+    
+    return product_types
+
+def boolean_search2(survey, product):
+    # draft for p4
+    skin, allergens = survey
+    product_types = getSkinType(skin)
+    # clean_ingreds = ast.literal_eval(product.clean_ingreds)
+    price = float(product.price[1:])
+
+    product_type = f"""SELECT * FROM products WHERE LOWER( product_type ) IN '%%{skin_types}%%'"""
+    # allergies = f"""SELECT * FROM products WHERE LOWER( clean_ingreds ) IN '%%{allergens}%%'"""
+    price = f"""SELECT * FROM products WHERE price BETWEEN '%%{price*0.9}%%' AND '%%{price*1.1}%%'"""
+    
+    keys = ["product_name","product_url","product_type","clean_ingreds","price"]
+    query_sql1 = np.intersect1d(product_type,price) 
+    # query_sql2 = np.setdiff1d(query_sql1, allergies)
+    data = mysql_engine.query_selector(query_sql)
+    
+    return json.dumps([dict(zip(keys,i)) for i in data])
+
+
+def boolean_search1(product):
+    # draft for p3
+    # product includes product_name,product_url,product_type,clean_ingreds,price
+    product_name = product.product_name
+    price = float(product.price[1:])
+
+    product_type = f"""SELECT * FROM products WHERE LOWER( product_type ) LIKE '%%{product_name.lower()}%%'"""
+    price = f"""SELECT * FROM products WHERE price BETWEEN '%%{price*0.9}%%' AND '%%{price*1.1}%%'"""
+    keys = ["product_name","product_url","product_type","clean_ingreds","price"]
+    
+    query_sql = np.intersect1d(product_type,price)
+    data = mysql_engine.query_selector(query_sql)
+    
+    return json.dumps([dict(zip(keys,i)) for i in data])
 
 @app.route("/")
 def home():
@@ -46,9 +99,9 @@ def home():
 
 
 @app.route("/products")
-def episodes_search():
+def products_search():
     text = request.args.get("product_name")
-    return sql_search(text)
+    return boolean_search1(text)
 
 
 app.run(debug=True)
