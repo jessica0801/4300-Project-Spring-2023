@@ -84,6 +84,12 @@ def price_filter(product_price):
 
     return json.dumps([dict(zip(keys,i)) for i in query2])
 
+def boolean_search1(product_type, product_price):
+    l1 = product_filter(product_type)
+    l2 = price_filter(product_price)
+    
+    return np.intersect1d(l1,l2)
+
 product = products[72]
 # print(product)
 # print(product_filter(product[2]))
