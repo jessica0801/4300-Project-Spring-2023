@@ -1,12 +1,11 @@
 import json
-import math
 import os
-import re
-import string
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
-
+import math
+import re
+import string
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -146,16 +145,18 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
         
 
 # name_tokens= {name:tokenize(name) for name in names}
-def cosine_sim(query):
+def cosine_sim(product):
     ans = []
-    products= request.args.get("product_name") #change if want review
-    inv_idx = build_inv_ind(products)
-    idf = compute_idf(inv_idx, len(products), 10, 0.1)
+    product_name = product.product_name
+    products= f"""SELECT * FROM products WHERE LOWER( product_name )"""
+    products_name = [prod.product_name for prod in products]
+    inv_idx = build_inv_ind(products_name)
+    idf = compute_idf(inv_idx, len(products_name), 10, 0.1)
     inv_idx = {key: val for key, val in inv_idx.items()
            if key in idf} 
-    norms = compute_norms(inv_idx, idf, len(products))
-    for _, id in index_search(query, inv_idx, idf, norms)[:10]:
-        ans+=[products[id]]
+    norms = compute_norms(inv_idx, idf, len(products_name))
+    for _, id in index_search(product_name, inv_idx, idf, norms)[:10]:
+        ans+=[products_name[id]]
     return ans
 
 app.run(debug=True)
