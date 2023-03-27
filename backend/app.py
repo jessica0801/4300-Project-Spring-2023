@@ -104,4 +104,4 @@ def products_search():
     return boolean_search1(text)
 
 
-# app.run(debug=True)
+app.run(debug=True)

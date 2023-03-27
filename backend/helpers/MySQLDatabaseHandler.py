@@ -47,3 +47,12 @@ class MySQLDatabaseHandler(object):
         self.query_executor(sql_file_data)
         sql_file.close()
 
+MYSQL_USER = "root"
+MYSQL_USER_PASSWORD = ""
+MYSQL_PORT = 3306
+MYSQL_DATABASE = "productsdb"
+
+mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
+                                    MYSQL_PORT, MYSQL_DATABASE)
+
+print(list(mysql_engine.query_selector(f"SELECT * FROM productinfo")))
