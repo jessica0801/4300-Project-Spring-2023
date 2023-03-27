@@ -119,9 +119,9 @@ def price_filter(product_price):
 
     return json.dumps([dict(zip(keys,i)) for i in query2])
 
-# product = products[2]
+product = products[2]
 # print(product)
-# print(product_filter(product[3]))
+print(product_filter(product[3]))
 # # print(product[1])
 # # print(price_filter(product[4]))
 
