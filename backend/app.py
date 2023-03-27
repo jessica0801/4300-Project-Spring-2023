@@ -24,8 +24,6 @@ mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
 # Path to init.sql file. This file can be replaced with your own file for testing on localhost, but do NOT move the init.sql file
 mysql_engine.load_file_into_db()
 
-# mysql_engine.load_file_into_db('skincare_products_clean.csv')
-
 app = Flask(__name__)
 CORS(app)
 
@@ -41,23 +39,30 @@ def sql_search(product):
     data = mysql_engine.query_selector(query_sql)
     return json.dumps([dict(zip(keys, i)) for i in data])
 
-def getSkinType(skin):
-    # 14 product types: moisturizer, serum, oil, mist, balm, mask, peel, eye care, 
+
+def getSkinType(skin_type):
+    # 14 product types: moisturizer, serum, oil, mist, balm, mask, peel, eye care,
     # cleanser, toner, exfoliater, bath salts, body wash, bath oil
     product_types = []
 
     if skin_type == 'normal' or skin_type == 'combination':
-        product_type = ['moisturizer', 'serum', 'oil', 'mist', 'balm', 'mask', 'peel', 'cleanser', 'toner', 'exfoliater']
+        product_types = [
+            'moisturizer', 'serum', 'oil', 'mist', 'balm', 'mask', 'peel',
+            'cleanser', 'toner', 'exfoliater'
+        ]
     elif skin_type == 'dry':
-        product_type = ['moisturizer','serum', 'oil', 'mist', 'balm', 'mask']
+        product_types = ['moisturizer', 'serum', 'oil', 'mist', 'balm', 'mask']
     elif skin_type == 'oily':
-        product_type = ['mist', 'peel', 'cleanser', 'toner', 'exfoliater']
+        product_types = ['mist', 'peel', 'cleanser', 'toner', 'exfoliater']
     elif skin_type == 'sensitive':
-        product_type = ['moisturizer', 'serum','mist', 'cleanser', 'toner', 'mask']
+        product_types = [
+            'moisturizer', 'serum', 'mist', 'cleanser', 'toner', 'mask'
+        ]
     else:
-        product_type = ['eye care', 'bath salts', 'body wash', 'bath oil']
-    
+        product_types = ['eye care', 'bath salts', 'body wash', 'bath oil']
+
     return product_types
+
 
 def boolean_search2(survey, product):
     # draft for p4
@@ -69,13 +74,15 @@ def boolean_search2(survey, product):
     product_type = f"""SELECT * FROM products WHERE LOWER( product_type ) IN '%%{skin_types}%%'"""
     # allergies = f"""SELECT * FROM products WHERE LOWER( clean_ingreds ) IN '%%{allergens}%%'"""
     price = f"""SELECT * FROM products WHERE price BETWEEN '%%{price*0.9}%%' AND '%%{price*1.1}%%'"""
-    
-    keys = ["product_name","product_url","product_type","clean_ingreds","price"]
-    query_sql1 = np.intersect1d(product_type,price) 
+
+    keys = [
+        "product_name", "product_url", "product_type", "clean_ingreds", "price"
+    ]
+    query_sql = np.intersect1d(product_type, price)
     # query_sql2 = np.setdiff1d(query_sql1, allergies)
     data = mysql_engine.query_selector(query_sql)
-    
-    return json.dumps([dict(zip(keys,i)) for i in data])
+
+    return json.dumps([dict(zip(keys, i)) for i in data])
 
 
 def boolean_search1(product):
@@ -86,12 +93,15 @@ def boolean_search1(product):
 
     product_type = f"""SELECT * FROM products WHERE LOWER( product_type ) LIKE '%%{product_name.lower()}%%'"""
     price = f"""SELECT * FROM products WHERE price BETWEEN '%%{price*0.9}%%' AND '%%{price*1.1}%%'"""
-    keys = ["product_name","product_url","product_type","clean_ingreds","price"]
-    
-    query_sql = np.intersect1d(product_type,price)
+    keys = [
+        "product_name", "product_url", "product_type", "clean_ingreds", "price"
+    ]
+
+    query_sql = np.intersect1d(product_type, price)
     data = mysql_engine.query_selector(query_sql)
-    
-    return json.dumps([dict(zip(keys,i)) for i in data])
+
+    return json.dumps([dict(zip(keys, i)) for i in data])
+
 
 @app.route("/")
 def home():
@@ -104,4 +114,4 @@ def products_search():
     return boolean_search1(text)
 
 
-app.run(debug=True)
+# app.run(debug=True)
