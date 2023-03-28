@@ -127,7 +127,7 @@ def price_filter(product_price):
 
 product = products[2]
 # print(product)
-print(product_filter(product[3]))
+# print(product_filter(product[3]))
 # # print(product[1])
 # # print(price_filter(product[4]))
 
@@ -256,10 +256,12 @@ def cosine_sim(product):
     return ans
 
 
-@app.route("/product-type")
+@app.route('/product-type')
 def product_type_search():
     text = request.args.get("product_type")
-    return product_filter(text)
+    results = product_filter(text)
+    return results
+    # return "welcome to product type {product-type} page"
 
 
 app.run(debug=True)

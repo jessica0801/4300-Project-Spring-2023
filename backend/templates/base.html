@@ -35,7 +35,7 @@
                 </p>
                 <input class="input-box" type="text" id="allergies" name="allergies"
                     placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br> -->
-                <input class="button" type="submit" name="submit" value="submit">
+                <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
             </form>
         </div>
         <div id="answer-box"></div>
@@ -48,7 +48,7 @@
             <p class='product-url'>${url}</p>
             </div>`
         }
-        document.getElementById("form").addEventListener("submit", sendForm);
+        // document.getElementById("form").addEventListener("click", sendForm);
 
         function sendForm() {
             console.log('form sent')
@@ -70,18 +70,21 @@
             // console.log(allergies.value);
 
             // pass to python function to get results
+            displayProducts(product_type)
         }
     function displayProducts(type) {
-        console.log(displayProducts)
+        console.log(type.value)
         document.getElementById("answer-box").innerHTML = ""
-        fetch("/product_type?" + new URLSearchParams({ product_type: type }).toString() + "&submit=submit")
+        // console.log("/product_type?" + new URLSearchParams({product_type : type.value}).toString())
+        fetch("/product-type?" + new URLSearchParams({product_type : type.value}).toString())
             .then((response) => response.json())
-            .then((data) => data.forEach(row => {
+            .then((data) => console.log(data))
+            // data.forEach(row => {
 
-            let tempDiv = document.createElement("div")
-            tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_url)
-            document.getElementById("answer-box").appendChild(tempDiv)
-            }));
+            // let tempDiv = document.createElement("div")
+            // tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_url)
+            // document.getElementById("answer-box").appendChild(tempDiv)}
+        // );
     }
 
     </script>
