@@ -117,7 +117,7 @@ def product_filter(product_type):
 
 def price_filter(product_price):
     price = float(product_price)
-    keys = ["id", "product_url", "product_type", "product_price"]
+    keys = ["id", "product_name", "product_url", "product_type", "product_price"]
 
     product_price = f"SELECT * FROM productinfo WHERE CAST(product_price as decimal(5,2)) BETWEEN '%%{price*0.5}%%' AND '%%{price*1.5}%%'"
     query2 = mysql_engine.query_selector(product_price)
@@ -264,4 +264,4 @@ def product_type_search():
     # return "welcome to product type {product-type} page"
 
 
-app.run(debug=True)
+# app.run(debug=True)

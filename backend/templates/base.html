@@ -78,10 +78,11 @@
         // console.log("/product_type?" + new URLSearchParams({product_type : type.value}).toString())
         fetch("/product-type?" + new URLSearchParams({product_type : type.value}).toString())
             .then((response) => response.json())
-            .then((data) => data.forEach(row => {
+            .then((data) => 
+            data.forEach(row => {
 
             let tempDiv = document.createElement("div")
-            tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_url)
+            tempDiv.innerHTML = answerBoxTemplate(row.product_url, row.product_type)
             document.getElementById("answer-box").appendChild(tempDiv)}
         ));
     }
