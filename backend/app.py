@@ -19,7 +19,7 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 MYSQL_USER = "root"
 MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
-MYSQL_DATABASE = "productsdb"
+MYSQL_DATABASE ="cosmetics_db"
 
 mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
                                     MYSQL_PORT, MYSQL_DATABASE)
@@ -109,7 +109,7 @@ def boolean_search1(product):
 def product_filter(product_type):
     keys = ["id", "product_url", "product_type", "product_price"]
 
-    product_type = f"SELECT * FROM productinfo WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%'"
+    product_type = f"SELECT * FROM productinfo WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%' LIMIT 10"
     query1 = mysql_engine.query_selector(product_type)
 
     return json.dumps([dict(zip(keys, i)) for i in query1])
@@ -117,7 +117,7 @@ def product_filter(product_type):
 
 def price_filter(product_price):
     price = float(product_price)
-    keys = ["id", "product_url", "product_type", "product_price"]
+    keys = ["id", "product_name", "product_url", "product_type", "product_price"]
 
     product_price = f"SELECT * FROM productinfo WHERE CAST(product_price as decimal(5,2)) BETWEEN '%%{price*0.5}%%' AND '%%{price*1.5}%%'"
     query2 = mysql_engine.query_selector(product_price)
@@ -127,7 +127,7 @@ def price_filter(product_price):
 
 product = products[2]
 # print(product)
-print(product_filter(product[3]))
+# print(product_filter(product[3]))
 # # print(product[1])
 # # print(price_filter(product[4]))
 
@@ -256,10 +256,12 @@ def cosine_sim(product):
     return ans
 
 
-@app.route("/product-type")
+@app.route('/product-type')
 def product_type_search():
     text = request.args.get("product_type")
-    return product_filter(text)
+    results = product_filter(text)
+    return results
+    # return "welcome to product type {product-type} page"
 
 
-app.run(debug=True)
+# app.run(debug=True)

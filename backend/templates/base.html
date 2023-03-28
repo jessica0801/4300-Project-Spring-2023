@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit&family=Montserrat&family=Open+Sans:wght@500&display=swap"
     rel="stylesheet">
-<script src="script.js"></script>
+<!-- <script type="text/javascript" src="./script.js"></script> -->
 
 <body class="homepage">
 
@@ -17,7 +17,7 @@
             <div class="google-colors">
                 <h3 id="google-c">let's get to know you</h3>
             </div>
-            <form class="form">
+            <form class="form" id="form">
                 <p>What type of product are you looking for?</p>
                 <div class="radio">
                     <input type="radio" id="moisturiser" name="product_type" value="moisturiser">
@@ -31,13 +31,61 @@
                     <input type="radio" id="balm" name="product_type" value="balm">
                     <label for="balm">balm</label><br>
                 </div>
-                <p>Do you have any allergies?
+                <!-- <p>Do you have any allergies?
                 </p>
                 <input class="input-box" type="text" id="allergies" name="allergies"
-                    placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br>
-                <input class="button" type="submit" name="submit" value="submit" onSubmit="sendForm(this.form)">
+                    placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br> -->
+                <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
             </form>
         </div>
         <div id="answer-box"></div>
     </div>
+
+    <script>
+        function answerBoxTemplate(name, url) {
+            return `<div class=''>
+            <h3 class='product-name'>${name}</h3>
+            <p class='product-url'>${url}</p>
+            </div>`
+        }
+        // document.getElementById("form").addEventListener("click", sendForm);
+
+        function sendForm() {
+            console.log('form sent')
+            // var skin_types = document.getElementsByName('skin_type');
+            // var skin_type = null;
+            // for (i = 0; i < skin_types.length; i++) {
+            //     if (skin_types[i].checked)
+            //     skin_type = skin_types[i];
+            // }
+            var product_types = document.getElementsByName('product_type');
+            var product_type = null;
+            for (i = 0; i < product_types.length; i++) {
+                if (product_types[i].checked)
+                product_type = product_types[i];
+            }
+            
+            // let allergies = document.getElementById("allergies");
+            // console.log(skin_type);
+            // console.log(allergies.value);
+
+            // pass to python function to get results
+            displayProducts(product_type)
+        }
+    function displayProducts(type) {
+        console.log(type.value)
+        document.getElementById("answer-box").innerHTML = ""
+        // console.log("/product_type?" + new URLSearchParams({product_type : type.value}).toString())
+        fetch("/product-type?" + new URLSearchParams({product_type : type.value}).toString())
+            .then((response) => response.json())
+            .then((data) => 
+            data.forEach(row => {
+
+            let tempDiv = document.createElement("div")
+            tempDiv.innerHTML = answerBoxTemplate(row.product_url, row.product_type)
+            document.getElementById("answer-box").appendChild(tempDiv)}
+        ));
+    }
+
+    </script>
 </body>
