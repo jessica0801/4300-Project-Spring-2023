@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS productsdb;
+CREATE DATABASE IF NOT EXISTS cosmetics_db;
 
-USE productsdb;
+USE cosmetics_db;
 DROP TABLE IF EXISTS productinfo;
 
 CREATE TABLE IF NOT EXISTS productinfo(
