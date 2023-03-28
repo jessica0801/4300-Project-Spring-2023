@@ -109,7 +109,7 @@ def boolean_search1(product):
 def product_filter(product_type):
     keys = ["id", "product_url", "product_type", "product_price"]
 
-    product_type = f"SELECT * FROM productinfo WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%'"
+    product_type = f"SELECT * FROM productinfo WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%' LIMIT 10"
     query1 = mysql_engine.query_selector(product_type)
 
     return json.dumps([dict(zip(keys, i)) for i in query1])
