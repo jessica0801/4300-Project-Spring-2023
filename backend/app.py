@@ -62,8 +62,7 @@ def sql_search(product):
 #     return json.dumps([dict(zip(keys, i)) for i in query2])
 
 def boolean_search(product_types, min_price, max_price):
-    keys = ["product_name", "product_brand", "price",
-            "product_description", "product_type"]
+    keys = ["product_name", "product_brand", "price", "product_review", "product_type"]
 
     survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]}) AND price BETWEEN {min_price} AND {max_price}"
     # print(survey)
@@ -166,12 +165,10 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
     ans.sort(key=lambda x: x[0], reverse=True)
     return ans
 
-keys = ["product_name", "product_review"]
+keys = ["product_name", "product_brand", "price", "product_review", "product_type"]
 
-products = f"""SELECT product_name, product_review FROM korean_skincare"""
-# product_revs = f"""SELECT product_review FROM korean_skincare"""
+products = f"""SELECT * FROM korean_skincare"""
 products = [dict(zip(keys, i)) for i in mysql_engine.query_selector(products)]
-# product_revs = json.dumps([dict(zip(keys, i)) for i in mysql_engine.query_selector(product_revs)])
 
 product_names = [dic["product_name"] for dic in products]
 product_revs = [dic["product_review"] for dic in products]
@@ -194,7 +191,7 @@ def cosine_sim(query):
     #     ans += [products[id]]
     # return json.dumps([dict(zip(keys, i)) for i in ans])
     for _, id in index_search(query, inv_idx, idf, norms)[:10]:
-         ans += [product_names[id]]
+         ans += [products[id]]
     return ans
 
 
@@ -217,5 +214,9 @@ def product_type_search():
 
 
 # print(boolean_search(['serum'], 0, 5))
-print(cosine_sim("sunscreen but for oily skin"))
+boolean = boolean_search(['sunscreen'], 0, 50)
+
+cosine_sim = cosine_sim("sunscreen but for oily skin")
+result = np.intersect1d(boolean, cosine_sim)
+
 app.run(debug=True)
