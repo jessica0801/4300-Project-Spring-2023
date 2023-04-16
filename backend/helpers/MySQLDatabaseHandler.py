@@ -62,14 +62,15 @@ class MySQLDatabaseHandler(object):
         self.query_executor(sql_file_data)
         sql_file.close()
 
-MYSQL_USER = "root"
-MYSQL_USER_PASSWORD = ""
-MYSQL_PORT = 3306
-MYSQL_DATABASE ="cosmetics_db"
-mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
-                                    MYSQL_PORT, MYSQL_DATABASE)
-mysql_engine.load_file_into_db()
-products = list(mysql_engine.query_selector(f"SELECT * FROM korean_skincare"))
-print(products)
-app = Flask(__name__)
-CORS(app)
+# os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
+# MYSQL_USER = "root"
+# MYSQL_USER_PASSWORD = ""
+# MYSQL_PORT = 3306
+# MYSQL_DATABASE ="cosmetics_db"
+# mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
+#                                     MYSQL_PORT, MYSQL_DATABASE)
+# # mysql_engine.load_file_into_db()
+# products = list(mysql_engine.query_selector(f"SELECT * FROM korean_skincare"))
+# print(products)
+# app = Flask(__name__)
+# CORS(app)
