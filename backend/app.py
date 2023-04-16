@@ -16,10 +16,10 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 # These are the DB credentials for your OWN MySQL
 # Don't worry about the deployment credentials, those are fixed
 # You can use a different DB name if you want to
-MYSQL_USER = "fran"
-MYSQL_USER_PASSWORD = "Totorin123!"
+MYSQL_USER = "root"
+MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
-MYSQL_DATABASE ="cosmetics_db"
+MYSQL_DATABASE = "cosmetics_db"
 
 mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
                                     MYSQL_PORT, MYSQL_DATABASE)
@@ -38,11 +38,11 @@ CORS(app)
 def sql_search(product):
     query_sql = f"""SELECT * FROM products WHERE LOWER( product_name ) LIKE '%%{product.lower()}%%' limit 10"""
     keys = [
-        "product_name","product_brand","price","product_description","product_type"
+        "product_name", "product_brand", "price", "product_description",
+        "product_type"
     ]
     data = mysql_engine.query_selector(query_sql)
     return json.dumps([dict(zip(keys, i)) for i in data])
-
 
 
 # def product_filter(product_type):
@@ -53,7 +53,6 @@ def sql_search(product):
 
 #     return json.dumps([dict(zip(keys, i)) for i in query1])
 
-
 # def price_filter(min_price, max_price):
 #     keys = ["product_name","product_brand","price","product_description","product_type"]
 
@@ -62,8 +61,12 @@ def sql_search(product):
 
 #     return json.dumps([dict(zip(keys, i)) for i in query2])
 
+
 def boolean_search(product_types, min_price, max_price):
-    keys = ["product_name","product_brand","price","product_description","product_type"]
+    keys = [
+        "product_name", "product_brand", "price", "product_description",
+        "product_type"
+    ]
 
     survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]})"
     # survey = f"""SELECT * FROM korean_skincare WHERE price BETWEEN {min_price} AND {max_price}"""
@@ -71,6 +74,7 @@ def boolean_search(product_types, min_price, max_price):
     query = mysql_engine.query_selector(survey)
 
     return json.dumps([dict(zip(keys, i)) for i in query])
+
 
 #start of cosine similarity
 def tokenize(text):
@@ -185,14 +189,17 @@ def cosine_sim(product):
         ans += [products_name[id]]
     return ans
 
+
 @app.route("/")
 def home():
     return render_template('base.html', title="sample html")
 
+
 @app.route('/product-type')
 def product_type_search():
     product_type = request.args.get("product_type")
-    min_price, max_price = request.args.get("product_price")
+    min_price = request.args.get("product_min_price")
+    max_price = request.args.get("product_max_price")
     boolean = boolean_search(product_type, min_price, max_price)
 
     keywords = request.args.get("keywords")
@@ -200,6 +207,7 @@ def product_type_search():
 
     result = np.intersect1d(boolean, cosine_sim)
     return result
+
 
 # print(boolean_search(['serum'], 0, 5))
 app.run(debug=True)
