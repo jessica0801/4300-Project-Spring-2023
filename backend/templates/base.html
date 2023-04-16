@@ -45,7 +45,7 @@
                     <input type="checkbox" id="exfoliater" name="product_type" value="exfoliater">
                     <label for="exfoliater">exfoliater</label>
                     <input type="checkbox" id="sun-protection" name="product_type" value="sun-protection">
-                    <label for="sun-protection">sun-protection</label>
+                    <label for="sun-protection">sunscreen</label>
                     <input type="checkbox" id="essence" name="product_type" value="essence">
                     <label for="essence">essence</label>
                     <input type="checkbox" id="other/spot-treatment" name="product_type" value="other/spot-treatment">
@@ -53,8 +53,29 @@
             </div>
 
             <div class="slidecontainer">
-                <input type="range" min="1" max="100" class="slider" id="myRange">
-            </div>
+                <header>
+                  <h2>Price Range</h2>
+                  <p>Use slider or enter min and max price</p>
+                </header>
+                <div class="price-input">
+                  <div class="field">
+                    <span>Min</span>
+                    <input type="number" class="input-min" value="2500">
+                  </div>
+                  <div class="separator">-</div>
+                  <div class="field">
+                    <span>Max</span>
+                    <input type="number" class="input-max" value="7500">
+                  </div>
+                </div>
+                <div class="slider">
+                  <div class="progress"></div>
+                </div>
+                <div class="range-input">
+                  <input type="range" class="range-min" min="0" max="10000" value="2500" step="100">
+                  <input type="range" class="range-max" min="0" max="10000" value="7500" step="100">
+                </div>
+              </div>
 
                 
                 <!-- <p>Do you have any allergies?
