@@ -11,6 +11,14 @@ function sendForm(form) {
     if (product_types[i].checked)
       product_type = product_types[i];
   }
+
+  var skin_types = document.getElementsByName('skin_type');
+  var skin_type = null;
+  for (i = 0; i < skin_types.length; i++) {
+    if (skin_types[i].checked)
+      skin_type = skin_types[i];
+  }
+
   let allergies = document.getElementById("allergies");
   console.log(skin_type);
   console.log(allergies.value);
