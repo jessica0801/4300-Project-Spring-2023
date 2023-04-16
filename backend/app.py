@@ -68,7 +68,7 @@ def boolean_search(product_types, min_price, max_price):
         "product_type"
     ]
 
-    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]}) AND price BETWEEN {min_price} AND {max_price}"
+    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)}) AND price BETWEEN {min_price} AND {max_price}"
     # print(survey)
     query = mysql_engine.query_selector(survey)
 
@@ -230,17 +230,17 @@ def product_type_search():
     return result
 
 
-boolean = boolean_search(['serum', 'sun protection', 'toner'], 0, 100)
+# boolean = boolean_search(['serum', 'sun protection', 'toner'], 0, 100)
 
-cosine_sim = cosine_sim("I want to protect my skin spf")
+# cosine_sim = cosine_sim("I want to protect my skin spf")
 
-bool_products = {dic["product_name"]: dic for dic in boolean}
-# print(bool_products)
-cosine_products = {dic["product_name"]: dic for dic in cosine_sim}
-# print(cosine_products)
-common_names = set(bool_products.keys()).intersection(
-    set(cosine_products.keys()))
-result = [bool_products[name] for name in common_names]
+# bool_products = {dic["product_name"]: dic for dic in boolean}
+# # print(bool_products)
+# cosine_products = {dic["product_name"]: dic for dic in cosine_sim}
+# # print(cosine_products)
+# common_names = set(bool_products.keys()).intersection(
+#     set(cosine_products.keys()))
+# result = [bool_products[name] for name in common_names]
 # print(result)
 
 app.run(debug=True)

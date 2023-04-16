@@ -88,18 +88,18 @@
             console.log('form sent')
             var product_types = document.getElementsByName('product_type');
             var keywords = document.getElementById('keywords').value;
-            var min_price = 0.0;
-            var max_price = 100.0;
-            var product_type = [];
+            var min_price = "0";
+            var max_price = "100";
+            var products = [];
 
             for (i = 0; i < product_types.length; i++) {
                 if (product_types[i].checked)
-                    product_type.push(product_types[i].value);
+                    products.push(product_types[i].value);
             }
-            console.log(product_type)
+            console.log(products)
 
             // pass to python function to get results
-            displayProducts(product_type[0])
+            displayProducts(products, min_price, max_price, keywords)
         }
 
         function displayProducts(types, min_price, max_price, keywords) {
