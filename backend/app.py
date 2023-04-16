@@ -64,7 +64,7 @@ def sql_search(product):
 
 def boolean_search(product_types, min_price, max_price):
     keys = [
-        "product_name", "product_brand", "price", "product_description",
+        "product_name", "product_brand", "price", "product_review",
         "product_type"
     ]
 
@@ -75,7 +75,6 @@ def boolean_search(product_types, min_price, max_price):
     return json.dumps([dict(zip(keys, i)) for i in query])
 
 
-#start of cosine similarity
 def tokenize(text):
     """text is a string. tokenize(text) cleans the text and removes stopwords 
     and punctuations.
@@ -191,36 +190,17 @@ idf = compute_idf(inv_idx, len(products), 10, 0.1)
 inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
 norms = compute_norms(inv_idx, idf, len(products))
 
-keys = [
-    "product_name", "product_brand", "price", "product_review", "product_type"
-]
-
-products = f"""SELECT * FROM korean_skincare"""
-products = [dict(zip(keys, i)) for i in mysql_engine.query_selector(products)]
-
-product_names = [dic["product_name"] for dic in products]
-product_revs = [dic["product_review"] for dic in products]
-# create tokenized dict from product revs to input to buikd_inv_ind
-tok_dict = {}
-for i in range(len(products)):
-    tok_dict[product_names[i]] = tokenize(product_revs[i])
-inv_idx = build_inv_ind(tok_dict)
-idf = compute_idf(inv_idx, len(products), 10, 0.1)
-inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
-norms = compute_norms(inv_idx, idf, len(products))
-
 
 def cosine_sim(query):
     ans = []
-    product_name = product.product_name
-    products = f"""SELECT * FROM korean_skincare WHERE LOWER( product_name )"""
-    products_name = [prod.product_name for prod in products]
-    inv_idx = build_inv_ind(products_name)
-    idf = compute_idf(inv_idx, len(products_name), 10, 0.1)
-    inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
-    norms = compute_norms(inv_idx, idf, len(products_name))
-    for _, id in index_search(product_name, inv_idx, idf, norms)[:10]:
-        ans += [products_name[id]]
+    # keys = [
+    #     "product_name", "product_brand", "price", "product_description", "product_type"
+    # ]
+    # for _, id in index_search(query, inv_idx, idf, norms)[:10]:
+    #     ans += [products[id]]
+    # return json.dumps([dict(zip(keys, i)) for i in ans])
+    for _, id in index_search(query, inv_idx, idf, norms)[:10]:
+        ans += [products[id]]
     return ans
 
 
@@ -240,6 +220,7 @@ def product_type_search():
     cosine_sim = cosine_sim(keywords)
 
     result = np.intersect1d(boolean, cosine_sim)
+    result = []
     return result
 
 
