@@ -10,8 +10,9 @@
     justify-content: start;
     align-items: center;
     flex-direction: column;
+    background-color: #dfeff1;
     background-image: url("./images/skincare3.jpeg");
-    background-repeat: repeat;
+    background-repeat: no-repeat;
     background-size: cover;
 }
 
@@ -94,6 +95,12 @@
     width: 20px;
 }
 
+.top-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 150px;
+}
 
 .input-box input {
     width: 100%;

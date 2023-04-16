@@ -16,8 +16,8 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 # These are the DB credentials for your OWN MySQL
 # Don't worry about the deployment credentials, those are fixed
 # You can use a different DB name if you want to
-MYSQL_USER = "root"
-MYSQL_USER_PASSWORD = ""
+MYSQL_USER = "fran"
+MYSQL_USER_PASSWORD = "Totorin123!"
 MYSQL_PORT = 3306
 MYSQL_DATABASE ="cosmetics_db"
 
@@ -26,7 +26,8 @@ mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
 
 # Path to init.sql file. This file can be replaced with your own file for testing on localhost, but do NOT move the init.sql file
 mysql_engine.load_file_into_db()
-products = list(mysql_engine.query_selector(f"SELECT * FROM productinfo"))
+products = list(mysql_engine.query_selector(f"SELECT * FROM korean_skincare"))
+# print(products)
 app = Flask(__name__)
 CORS(app)
 
@@ -37,112 +38,41 @@ CORS(app)
 def sql_search(product):
     query_sql = f"""SELECT * FROM products WHERE LOWER( product_name ) LIKE '%%{product.lower()}%%' limit 10"""
     keys = [
-        "product_name", "product_url", "product_type", "clean_ingreds", "price"
+        "product_name","product_brand","price","product_description","product_type"
     ]
     data = mysql_engine.query_selector(query_sql)
     return json.dumps([dict(zip(keys, i)) for i in data])
 
 
-def getSkinType(skin_type):
-    # 14 product types: moisturizer, serum, oil, mist, balm, mask, peel, eye care,
-    # cleanser, toner, exfoliater, bath salts, body wash, bath oil
-    product_types = []
 
-    if skin_type == 'normal' or skin_type == 'combination':
-        product_types = [
-            'moisturizer', 'serum', 'oil', 'mist', 'balm', 'mask', 'peel',
-            'cleanser', 'toner', 'exfoliater'
-        ]
-    elif skin_type == 'dry':
-        product_types = ['moisturizer', 'serum', 'oil', 'mist', 'balm', 'mask']
-    elif skin_type == 'oily':
-        product_types = ['mist', 'peel', 'cleanser', 'toner', 'exfoliater']
-    elif skin_type == 'sensitive':
-        product_types = [
-            'moisturizer', 'serum', 'mist', 'cleanser', 'toner', 'mask'
-        ]
-    else:
-        product_types = ['eye care', 'bath salts', 'body wash', 'bath oil']
+# def product_filter(product_type):
+#     keys = ["product_name","product_brand","price","product_description","product_type"]
 
-    return product_types
+#     product_type = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%'"
+#     query1 = mysql_engine.query_selector(product_type)
+
+#     return json.dumps([dict(zip(keys, i)) for i in query1])
 
 
-def boolean_search2(survey, product):
-    # draft for p4
-    skin, allergens = survey
-    product_types = getSkinType(skin)
-    # clean_ingreds = ast.literal_eval(product.clean_ingreds)
-    price = float(product.price[1:])
+# def price_filter(min_price, max_price):
+#     keys = ["product_name","product_brand","price","product_description","product_type"]
 
-    product_type = f"""SELECT * FROM products WHERE LOWER( product_type ) IN '%%{skin_types}%%'"""
-    # allergies = f"""SELECT * FROM products WHERE LOWER( clean_ingreds ) IN '%%{allergens}%%'"""
-    price = f"""SELECT * FROM products WHERE price BETWEEN '%%{price*0.9}%%' AND '%%{price*1.1}%%'"""
+#     product_price = f"SELECT * FROM korean_skincare WHERE price BETWEEN '%%{min_price}%%' AND '%%{max_price}%%'"
+#     query2 = mysql_engine.query_selector(product_price)
 
-    keys = [
-        "product_name", "product_url", "product_type", "clean_ingreds", "price"
-    ]
-    query_sql = np.intersect1d(product_type, price)
-    # query_sql2 = np.setdiff1d(query_sql1, allergies)
-    data = mysql_engine.query_selector(query_sql)
+#     return json.dumps([dict(zip(keys, i)) for i in query2])
 
-    return json.dumps([dict(zip(keys, i)) for i in data])
+def boolean_search(product_types, min_price, max_price):
+    keys = ["product_name","product_brand","price","product_description","product_type"]
 
+    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]})"
+    # survey = f"""SELECT * FROM korean_skincare WHERE price BETWEEN {min_price} AND {max_price}"""
+    # print(survey)
+    query = mysql_engine.query_selector(survey)
 
-def boolean_search1(product):
-    # draft for p3
-    # product includes product_name,product_url,product_type,clean_ingreds,price
-    product_name = product.product_name
-    price = float(product.price[1:])
+    return json.dumps([dict(zip(keys, i)) for i in query])
 
-    product_type = f"""SELECT * FROM products WHERE LOWER( product_type ) LIKE '%%{product_name.lower()}%%'"""
-    price = f"""SELECT * FROM products WHERE price BETWEEN '%%{price*0.9}%%' AND '%%{price*1.1}%%'"""
-    keys = [
-        "product_name", "product_url", "product_type", "clean_ingreds", "price"
-    ]
-
-    query_sql = np.intersect1d(product_type, price)
-    data = mysql_engine.query_selector(query_sql)
-
-    return json.dumps([dict(zip(keys, i)) for i in data])
-
-
-def product_filter(product_type):
-    keys = ["id", "product_url", "product_type", "product_price"]
-
-    product_type = f"SELECT * FROM productinfo WHERE LOWER( product_type ) LIKE '%%{product_type.lower()}%%' LIMIT 10"
-    query1 = mysql_engine.query_selector(product_type)
-
-    return json.dumps([dict(zip(keys, i)) for i in query1])
-
-
-def price_filter(product_price):
-    price = float(product_price)
-    keys = ["id", "product_name", "product_url", "product_type", "product_price"]
-
-    product_price = f"SELECT * FROM productinfo WHERE CAST(product_price as decimal(5,2)) BETWEEN '%%{price*0.5}%%' AND '%%{price*1.5}%%'"
-    query2 = mysql_engine.query_selector(product_price)
-
-    return json.dumps([dict(zip(keys, i)) for i in query2])
-
-
-product = products[2]
-# print(product)
-# print(product_filter(product[3]))
-# # print(product[1])
-# # print(price_filter(product[4]))
-
-
-@app.route("/")
-def home():
-    return render_template('base.html', title="sample html")
-
-
-@app.route("/products")
-def products_search():
-    text = request.args.get("product_name")
-    return boolean_search1(text)
-
-
+#start of cosine similarity
 def tokenize(text):
     """text is a string. tokenize(text) cleans the text and removes stopwords 
     and punctuations.
@@ -245,7 +175,7 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
 def cosine_sim(product):
     ans = []
     product_name = product.product_name
-    products = f"""SELECT * FROM products WHERE LOWER( product_name )"""
+    products = f"""SELECT * FROM korean_skincare WHERE LOWER( product_name )"""
     products_name = [prod.product_name for prod in products]
     inv_idx = build_inv_ind(products_name)
     idf = compute_idf(inv_idx, len(products_name), 10, 0.1)
@@ -255,13 +185,21 @@ def cosine_sim(product):
         ans += [products_name[id]]
     return ans
 
+@app.route("/")
+def home():
+    return render_template('base.html', title="sample html")
 
 @app.route('/product-type')
 def product_type_search():
-    text = request.args.get("product_type")
-    results = product_filter(text)
-    return results
-    # return "welcome to product type {product-type} page"
+    product_type = request.args.get("product_type")
+    min_price, max_price = request.args.get("product_price")
+    boolean = boolean_search(product_type, min_price, max_price)
 
+    keywords = request.args.get("keywords")
+    cosine_sim = cosine_sim(keywords)
 
-# app.run(debug=True)
+    result = np.intersect1d(boolean, cosine_sim)
+    return result
+
+# print(boolean_search(['serum'], 0, 5))
+app.run(debug=True)
