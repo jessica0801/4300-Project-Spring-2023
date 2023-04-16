@@ -37,10 +37,18 @@
                     <input type="radio" id="balm" name="product_type" value="balm">
                     <label for="balm">balm</label><br>
                 </div>
-                <!-- <p>Do you have any allergies?
-                    </p>
-                    <input class="input-box" type="text" id="allergies" name="allergies"
-                        placeholder="e.g. natural rubber, natural fragrances, preservatives, dyes, or metals"><br><br> -->
+                <div>
+                    <label for="keywords" class="form-label">Keywords</label>
+                    <input class="form-control" type="text" list="keywordOptions" id="keywords"
+                        placeholder="Type to search...">
+                    <datalist id="keywordOptions">
+                        <option value="moisturizing">
+                        <option value="brightening">
+                        <option value="sunscreen">
+                        <option value="lotion">
+                        <option value="clean">
+                    </datalist>
+                </div>
                 <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
             </form>
         </div>
@@ -58,22 +66,13 @@
 
         function sendForm() {
             console.log('form sent')
-            // var skin_types = document.getElementsByName('skin_type');
-            // var skin_type = null;
-            // for (i = 0; i < skin_types.length; i++) {
-            //     if (skin_types[i].checked)
-            //     skin_type = skin_types[i];
-            // }
             var product_types = document.getElementsByName('product_type');
+            var keywords = document.getElementById('keywords').value;
             var product_type = null;
             for (i = 0; i < product_types.length; i++) {
                 if (product_types[i].checked)
                     product_type = product_types[i];
             }
-
-            // let allergies = document.getElementById("allergies");
-            // console.log(skin_type);
-            // console.log(allergies.value);
 
             // pass to python function to get results
             displayProducts(product_type)
