@@ -71,30 +71,27 @@ def boolean_search(product_types, min_price, max_price):
 
     return json.dumps([dict(zip(keys, i)) for i in query])
 
-#start of cosine similarity
 def tokenize(text):
     """text is a string. tokenize(text) cleans the text and removes stopwords 
     and punctuations.
     returns: list of words"""
     text = ''.join([word for word in text if word not in string.punctuation])
     text = text.lower()
-    stopwords = [
-        "ourselves", "hers", "between", "yourself", "but", "again", "there",
-        "about", "once", "during", "out", "very", "having", "with", "they",
-        "own", "an", "be", "some", "for", "do", "its", "yours", "such", "into",
-        "of", "most", "itself", "other", "off", "is", "s", "am", "or", "who",
-        "as", "from", "him", "each", "the", "themselves", "until", "below",
-        "are", "we", "these", "your", "his", "through", "don", "nor", "me",
-        "were", "her", "more", "himself", "this", "down", "should", "our",
-        "their", "while", "above", "both", "up", "to", "ours", "had", "she",
-        "all", "no", "when", "at", "any", "before", "them", "same", "and",
-        "been", "have", "in", "will", "on", "does", "yourselves", "then",
-        "that", "because", "what", "over", "why", "so", "can", "did", "not",
-        "now", "under", "he", "you", "herself", "has", "just", "where", "too",
-        "only", "myself", "which", "those", "i", "after", "few", "whom", "t",
-        "being", "if", "theirs", "my", "against", "a", "by", "doing", "it",
-        "how", "further", "was", "here", "than"
-    ]
+    stopwords = ["ourselves", "hers", "between", "yourself", "but", "again", "there",
+                 "about", "once", "during", "out", "very", "having", "with", "they",
+                 "own", "an", "be", "some", "for", "do", "its", "yours", "such",
+                 "into", "of", "most", "itself", "other", "off", "is", "s", "am",
+                 "or", "who", "as", "from", "him", "each", "the", "themselves",
+                 "until", "below", "are", "we", "these", "your", "his", "through",
+                 "don", "nor", "me", "were", "her", "more", "himself", "this", "down",
+                 "should", "our", "their", "while", "above", "both", "up", "to", "ours",
+                 "had", "she", "all", "no", "when", "at", "any", "before", "them", "same",
+                 "and", "been", "have", "in", "will", "on", "does", "yourselves", "then",
+                 "that", "because", "what", "over", "why", "so", "can", "did", "not", "now",
+                 "under", "he", "you", "herself", "has", "just", "where", "too", "only",
+                 "myself", "which", "those", "i", "after", "few", "whom", "t", "being", "if",
+                 "theirs", "my", "against", "a", "by", "doing", "it", "how", "further", "was",
+                 "here", "than"]
     text = ' '.join([word for word in text.split() if word not in stopwords])
     return re.findall("[A-Za-z]+", text)
 
@@ -119,9 +116,8 @@ def compute_idf(inv_ind, num_products, min_df, max_df_ratio):
     ans = {}
     for word in inv_ind.keys():
         contains = len(inv_ind[word])
-        if min_df <= contains and float(
-                contains) / num_products <= max_df_ratio:
-            ans[word] = round(math.log2(num_products / float(1 + contains)), 2)
+        if min_df <= contains and float(contains)/num_products <= max_df_ratio:
+            ans[word] = round(math.log2(num_products / float(1+contains)), 2)
     return ans
 
 
@@ -137,7 +133,6 @@ def compute_norms(index, idf, num_products):
     return ans
 
 
-#query_word_counts: example_query_words = {"like": 2, "mother": 1, "daughter": 1}
 def acc_dot_scores(query_word_counts, index, idf):
     ans = {}
     for word in query_word_counts.keys():
@@ -170,19 +165,25 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
     return ans
 
 
-# name_tokens= {name:tokenize(name) for name in names}
-def cosine_sim(product):
+products = f"""SELECT product_name FROM korean_skincare"""
+product_revs = f"""SELECT product_review FROM korean_skincare"""
+# create tokenized dict from product revs to input to buikd_inv_ind
+inv_idx = build_inv_ind(product_revs)
+idf = compute_idf(inv_idx, len(products), 10, 0.1)
+inv_idx = {key: val for key, val in inv_idx.items()
+           if key in idf}
+norms = compute_norms(inv_idx, idf, len(products))
+
+
+def cosine_sim(query):
     ans = []
-    product_name = product.product_name
-    products = f"""SELECT * FROM korean_skincare WHERE LOWER( product_name )"""
-    products_name = [prod.product_name for prod in products]
-    inv_idx = build_inv_ind(products_name)
-    idf = compute_idf(inv_idx, len(products_name), 10, 0.1)
-    inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
-    norms = compute_norms(inv_idx, idf, len(products_name))
-    for _, id in index_search(product_name, inv_idx, idf, norms)[:10]:
-        ans += [products_name[id]]
-    return ans
+    keys = [
+        "product_name", "product_brand", "price", "product_description", "product_type"
+    ]
+    for _, id in index_search(query, inv_idx, idf, norms)[:10]:
+        ans += [products[id]]
+    return json.dumps([dict(zip(keys, i)) for i in ans])
+
 
 @app.route("/")
 def home():
@@ -201,4 +202,5 @@ def product_type_search():
     return result
 
 # print(boolean_search(['serum'], 0, 5))
+print(cosine_sim("sunscreen but for oily skin"))
 app.run(debug=True)
