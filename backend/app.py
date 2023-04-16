@@ -68,7 +68,7 @@ def boolean_search(product_types, min_price, max_price):
     # print(survey)
     query = mysql_engine.query_selector(survey)
 
-    return json.dumps([dict(zip(keys, i)) for i in query])
+    return [dict(zip(keys, i)) for i in query]
 
 
 
@@ -203,20 +203,32 @@ def home():
 @app.route('/product-type')
 def product_type_search():
     product_type = request.args.get("product_type")
+
     min_price, max_price = request.args.get("product_price")
     boolean = boolean_search(product_type, min_price, max_price)
 
     keywords = request.args.get("keywords")
     cosine_sim = cosine_sim(keywords)
 
-    result = np.intersect1d(boolean, cosine_sim)
+    bool_products = {dic["product_name"]:dic for dic in boolean}
+    # print(bool_products)
+    cosine_products = {dic["product_name"]:dic for dic in cosine_sim}
+    # print(cosine_products)
+    common_names = set(bool_products.keys()).intersection(set(cosine_products.keys()))
+    result = [bool_products[name] for name in common_names]
+    
     return result
 
+boolean = boolean_search(['serum', 'sun protection', 'toner'], 0, 100)
 
-# print(boolean_search(['serum'], 0, 5))
-boolean = boolean_search(['sunscreen'], 0, 50)
+cosine_sim = cosine_sim("I want to protect my skin spf")
 
-cosine_sim = cosine_sim("sunscreen but for oily skin")
-result = np.intersect1d(boolean, cosine_sim)
+bool_products = {dic["product_name"]:dic for dic in boolean}
+# print(bool_products)
+cosine_products = {dic["product_name"]:dic for dic in cosine_sim}
+# print(cosine_products)
+common_names = set(bool_products.keys()).intersection(set(cosine_products.keys()))
+result = [bool_products[name] for name in common_names]
+# print(result)
 
 app.run(debug=True)
