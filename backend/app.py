@@ -72,6 +72,7 @@ def boolean_search(product_types, min_price, max_price):
     return json.dumps([dict(zip(keys, i)) for i in query])
 
 
+
 def tokenize(text):
     """text is a string. tokenize(text) cleans the text and removes stopwords 
     and punctuations.
@@ -100,7 +101,7 @@ def tokenize(text):
 def build_inv_ind(tokenized_dict):
     ans = {}
     for id in range(len(tokenized_dict)):
-        doc = tokenized_dict.keys()[id]
+        doc = list(tokenized_dict.keys())[id]
         tmp = {}
         for word in tokenized_dict[doc]:
             if word not in tmp:
@@ -123,7 +124,7 @@ def compute_idf(inv_ind, num_products, min_df, max_df_ratio):
 
 
 def compute_norms(index, idf, num_products):
-    ans = [0 for _ in num_products]
+    ans = [0 for _ in range(num_products)]
     for word in index.keys():
         if word in idf:
             for pair in index[word]:
@@ -165,28 +166,36 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
     ans.sort(key=lambda x: x[0], reverse=True)
     return ans
 
+keys = ["product_name", "product_review"]
 
-products = f"""SELECT product_name FROM korean_skincare"""
-product_revs = f"""SELECT product_review FROM korean_skincare"""
+products = f"""SELECT product_name, product_review FROM korean_skincare"""
+# product_revs = f"""SELECT product_review FROM korean_skincare"""
+products = [dict(zip(keys, i)) for i in mysql_engine.query_selector(products)]
+# product_revs = json.dumps([dict(zip(keys, i)) for i in mysql_engine.query_selector(product_revs)])
+
+product_names = [dic["product_name"] for dic in products]
+product_revs = [dic["product_review"] for dic in products]
 # create tokenized dict from product revs to input to buikd_inv_ind
 tok_dict = {}
 for i in range(len(products)):
-    tok_dict[products[i]] = tokenize(product_revs[i])
+    tok_dict[product_names[i]] = tokenize(product_revs[i])
 inv_idx = build_inv_ind(tok_dict)
 idf = compute_idf(inv_idx, len(products), 10, 0.1)
 inv_idx = {key: val for key, val in inv_idx.items()
            if key in idf}
 norms = compute_norms(inv_idx, idf, len(products))
 
-
 def cosine_sim(query):
     ans = []
-    keys = [
-        "product_name", "product_brand", "price", "product_description", "product_type"
-    ]
+    # keys = [
+    #     "product_name", "product_brand", "price", "product_description", "product_type"
+    # ]
+    # for _, id in index_search(query, inv_idx, idf, norms)[:10]:
+    #     ans += [products[id]]
+    # return json.dumps([dict(zip(keys, i)) for i in ans])
     for _, id in index_search(query, inv_idx, idf, norms)[:10]:
-        ans += [products[id]]
-    return json.dumps([dict(zip(keys, i)) for i in ans])
+         ans += [product_names[id]]
+    return ans
 
 
 @app.route("/")
