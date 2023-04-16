@@ -16,8 +16,8 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 # These are the DB credentials for your OWN MySQL
 # Don't worry about the deployment credentials, those are fixed
 # You can use a different DB name if you want to
-MYSQL_USER = "fran"
-MYSQL_USER_PASSWORD = "Totorin123!"
+MYSQL_USER = "root"
+MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
 MYSQL_DATABASE ="cosmetics_db"
 
@@ -65,8 +65,7 @@ def sql_search(product):
 def boolean_search(product_types, min_price, max_price):
     keys = ["product_name","product_brand","price","product_description","product_type"]
 
-    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]})"
-    # survey = f"""SELECT * FROM korean_skincare WHERE price BETWEEN {min_price} AND {max_price}"""
+    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]}) AND price BETWEEN {min_price} AND {max_price}"
     # print(survey)
     query = mysql_engine.query_selector(survey)
 
