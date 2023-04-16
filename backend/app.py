@@ -68,8 +68,7 @@ def boolean_search(product_types, min_price, max_price):
         "product_type"
     ]
 
-    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]})"
-    # survey = f"""SELECT * FROM korean_skincare WHERE price BETWEEN {min_price} AND {max_price}"""
+    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]}) AND price BETWEEN {min_price} AND {max_price}"
     # print(survey)
     query = mysql_engine.query_selector(survey)
 
@@ -107,7 +106,7 @@ def tokenize(text):
 def build_inv_ind(tokenized_dict):
     ans = {}
     for id in range(len(tokenized_dict)):
-        doc = tokenized_dict.keys()[id]
+        doc = list(tokenized_dict.keys())[id]
         tmp = {}
         for word in tokenized_dict[doc]:
             if word not in tmp:
@@ -131,7 +130,7 @@ def compute_idf(inv_ind, num_products, min_df, max_df_ratio):
 
 
 def compute_norms(index, idf, num_products):
-    ans = [0 for _ in num_products]
+    ans = [0 for _ in range(num_products)]
     for word in index.keys():
         if word in idf:
             for pair in index[word]:
@@ -142,7 +141,6 @@ def compute_norms(index, idf, num_products):
     return ans
 
 
-#query_word_counts: example_query_words = {"like": 2, "mother": 1, "daughter": 1}
 def acc_dot_scores(query_word_counts, index, idf):
     ans = {}
     for word in query_word_counts.keys():
@@ -175,8 +173,44 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
     return ans
 
 
-# name_tokens= {name:tokenize(name) for name in names}
-def cosine_sim(product):
+keys = [
+    "product_name", "product_brand", "price", "product_review", "product_type"
+]
+
+products = f"""SELECT * FROM korean_skincare"""
+products = [dict(zip(keys, i)) for i in mysql_engine.query_selector(products)]
+
+product_names = [dic["product_name"] for dic in products]
+product_revs = [dic["product_review"] for dic in products]
+# create tokenized dict from product revs to input to buikd_inv_ind
+tok_dict = {}
+for i in range(len(products)):
+    tok_dict[product_names[i]] = tokenize(product_revs[i])
+inv_idx = build_inv_ind(tok_dict)
+idf = compute_idf(inv_idx, len(products), 10, 0.1)
+inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
+norms = compute_norms(inv_idx, idf, len(products))
+
+keys = [
+    "product_name", "product_brand", "price", "product_review", "product_type"
+]
+
+products = f"""SELECT * FROM korean_skincare"""
+products = [dict(zip(keys, i)) for i in mysql_engine.query_selector(products)]
+
+product_names = [dic["product_name"] for dic in products]
+product_revs = [dic["product_review"] for dic in products]
+# create tokenized dict from product revs to input to buikd_inv_ind
+tok_dict = {}
+for i in range(len(products)):
+    tok_dict[product_names[i]] = tokenize(product_revs[i])
+inv_idx = build_inv_ind(tok_dict)
+idf = compute_idf(inv_idx, len(products), 10, 0.1)
+inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
+norms = compute_norms(inv_idx, idf, len(products))
+
+
+def cosine_sim(query):
     ans = []
     product_name = product.product_name
     products = f"""SELECT * FROM korean_skincare WHERE LOWER( product_name )"""
@@ -210,4 +244,9 @@ def product_type_search():
 
 
 # print(boolean_search(['serum'], 0, 5))
+boolean = boolean_search(['sunscreen'], 0, 50)
+
+cosine_sim = cosine_sim("sunscreen but for oily skin")
+result = np.intersect1d(boolean, cosine_sim)
+
 app.run(debug=True)
