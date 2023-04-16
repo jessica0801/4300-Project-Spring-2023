@@ -19,7 +19,7 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 MYSQL_USER = "root"
 MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
-MYSQL_DATABASE ="cosmetics_db"
+MYSQL_DATABASE = "cosmetics_db"
 
 mysql_engine = MySQLDatabaseHandler(MYSQL_USER, MYSQL_USER_PASSWORD,
                                     MYSQL_PORT, MYSQL_DATABASE)
@@ -38,11 +38,10 @@ CORS(app)
 def sql_search(product):
     query_sql = f"""SELECT * FROM products WHERE LOWER( product_name ) LIKE '%%{product.lower()}%%' limit 10"""
     keys = [
-        "product_name","product_brand","price","product_description","product_type"
+        "product_name", "product_brand", "price", "product_description", "product_type"
     ]
     data = mysql_engine.query_selector(query_sql)
     return json.dumps([dict(zip(keys, i)) for i in data])
-
 
 
 # def product_filter(product_type):
@@ -63,13 +62,15 @@ def sql_search(product):
 #     return json.dumps([dict(zip(keys, i)) for i in query2])
 
 def boolean_search(product_types, min_price, max_price):
-    keys = ["product_name","product_brand","price","product_description","product_type"]
+    keys = ["product_name", "product_brand", "price",
+            "product_description", "product_type"]
 
     survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)[1:-1]}) AND price BETWEEN {min_price} AND {max_price}"
     # print(survey)
     query = mysql_engine.query_selector(survey)
 
     return json.dumps([dict(zip(keys, i)) for i in query])
+
 
 def tokenize(text):
     """text is a string. tokenize(text) cleans the text and removes stopwords 
@@ -168,7 +169,10 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
 products = f"""SELECT product_name FROM korean_skincare"""
 product_revs = f"""SELECT product_review FROM korean_skincare"""
 # create tokenized dict from product revs to input to buikd_inv_ind
-inv_idx = build_inv_ind(product_revs)
+tok_dict = {}
+for i in range(len(products)):
+    tok_dict[products[i]] = tokenize(product_revs[i])
+inv_idx = build_inv_ind(tok_dict)
 idf = compute_idf(inv_idx, len(products), 10, 0.1)
 inv_idx = {key: val for key, val in inv_idx.items()
            if key in idf}
@@ -189,6 +193,7 @@ def cosine_sim(query):
 def home():
     return render_template('base.html', title="sample html")
 
+
 @app.route('/product-type')
 def product_type_search():
     product_type = request.args.get("product_type")
@@ -200,6 +205,7 @@ def product_type_search():
 
     result = np.intersect1d(boolean, cosine_sim)
     return result
+
 
 # print(boolean_search(['serum'], 0, 5))
 print(cosine_sim("sunscreen but for oily skin"))
