@@ -126,12 +126,15 @@
             fetch("/product-type?" + new URLSearchParams({ product_type: types, product_min_price: min_price, product_max_price: max_price, keywords: keywords }).toString())
                 .then((response) => response.json())
                 .then((data) =>
-                    data.forEach(row => {
-                        let tempDiv = document.createElement("div")
-                        tempDiv.innerHTML = answerBoxTemplate(row.product_url, row.product_type)
-                        document.getElementById("answer-box").appendChild(tempDiv)
-                    }
-                    ));
+                    console.log(data)
+                    // data.forEach(row => {
+                    //     let tempDiv = document.createElement("div")
+                    //     tempDiv.innerHTML = answerBoxTemplate(row.product_url, row.product_type)
+                    //     document.getElementById("answer-box").appendChild(tempDiv)
+                    // }
+                    // )
+                    )
+                    ;
         }
 
     </script>

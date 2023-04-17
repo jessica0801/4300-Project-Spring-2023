@@ -62,16 +62,18 @@ def sql_search(product):
 #     return json.dumps([dict(zip(keys, i)) for i in query2])
 
 
-def boolean_search(product_types, min_price, max_price):
-    keys = [
-        "product_name", "product_brand", "price", "product_review",
-        "product_type"
-    ]
+def boolean_search(product_types, min_price = 0, max_price = 100000):
+    # 'serum,sun-protection'
+    pt = product_types.split(",")
+    # ['serum','sun-protection']
+    product_types_after = "(" + str(pt)[1:-1] + ")"
+    # ('serum', 'sun-protection')
 
-    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN ({str(product_types)}) AND price BETWEEN {min_price} AND {max_price}"
-    # print(survey)
+    keys = ["product_name", "product_brand", "price", "product_review", "product_type"]
+
+    survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN {product_types_after} AND price BETWEEN {min_price} AND {max_price}"
+
     query = mysql_engine.query_selector(survey)
-
     return [dict(zip(keys, i)) for i in query]
 
 
@@ -215,22 +217,22 @@ def product_type_search():
     min_price = request.args.get("product_min_price")
     max_price = request.args.get("product_max_price")
     boolean = boolean_search(product_type, min_price, max_price)
-
+    # print(boolean)
     keywords = request.args.get("keywords")
-    cosine_sim = cosine_sim(keywords)
+    cosine = cosine_sim(keywords)
 
     bool_products = {dic["product_name"]: dic for dic in boolean}
-    # print(bool_products)
-    cosine_products = {dic["product_name"]: dic for dic in cosine_sim}
-    # print(cosine_products)
-    common_names = set(bool_products.keys()).intersection(
-        set(cosine_products.keys()))
+    # print(bool_products.keys())
+    cosine_products = {dic["product_name"]: dic for dic in cosine}
+    # print(cosine_products.keys())
+    common_names = set(bool_products.keys()).intersection(set(cosine_products.keys()))
+    # print(common_names)
     result = [bool_products[name] for name in common_names]
-
+    # print(result)
     return result
 
-
-# boolean = boolean_search(['serum', 'sun protection', 'toner'], 0, 100)
+# boolean = boolean_search("serum,sun protection", 0, 100)
+# print(boolean)
 
 # cosine_sim = cosine_sim("I want to protect my skin spf")
 
