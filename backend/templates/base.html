@@ -59,28 +59,34 @@
                     <div class="price-input">
                         <div class="field">
                             <span>Min</span>
-                            <input type="number" class="input-min" value="2500">
+                            <input type="number" class="input-min" value="0">
                         </div>
                         <div class="separator">-</div>
                         <div class="field">
                             <span>Max</span>
-                            <input type="number" class="input-max" value="7500">
+                            <input type="number" class="input-max" value="150">
                         </div>
+                    <br>
+                    <!-- <div class="slider">
+                        <div class="progress"></div>
                     </div>
-                    <div>
-                        <label for="keywords" class="form-label">Keywords</label>
-                        <input class="form-control" type="text" list="keywordOptions" id="keywords"
-                            placeholder="Type to search...">
-                        <datalist id="keywordOptions">
-                            <option value="moisturizing">
-                            <option value="brightening">
-                            <option value="sunscreen">
-                            <option value="lotion">
-                            <option value="clean">
-                        </datalist>
-                    </div>
+                    <div class="range-input">
+                        <input type="range" class="range-min" min="0" max="200" value="0" step="10">
+                        <input type="range" class="range-max" min="0" max="200" value="150" step="10">
+                    </div> -->
                 </div>
-
+                <div>
+                    <label for="keywords" class="form-label">Keywords</label>
+                    <input class="form-control" type="text" list="keywordOptions" id="keywords" 
+                    placeholder="Type to search...">
+                    <datalist id="keywordOptions">
+                        <option value="moisturizing">
+                        <option value="brightening">
+                        <option value="sunscreen">
+                        <option value="lotion">
+                        <option value="clean">
+                    </datalist>
+                </div>
                 <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
             </form>
         </div>
@@ -107,7 +113,7 @@
             var product_types = document.getElementsByName('product_type');
             var keywords = document.getElementById('keywords').value;
             var min_price = "0";
-            var max_price = "100";
+            var max_price = "150";
             var products = [];
 
             for (i = 0; i < product_types.length; i++) {
