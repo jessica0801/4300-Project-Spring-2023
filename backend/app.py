@@ -16,8 +16,8 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..", os.curdir))
 # These are the DB credentials for your OWN MySQL
 # Don't worry about the deployment credentials, those are fixed
 # You can use a different DB name if you want to
-MYSQL_USER = "fran"
-MYSQL_USER_PASSWORD = "Totorin123!"
+MYSQL_USER = "root"
+MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
 MYSQL_DATABASE = "cosmetics_db"
 
@@ -62,14 +62,17 @@ def sql_search(product):
 #     return json.dumps([dict(zip(keys, i)) for i in query2])
 
 
-def boolean_search(product_types, min_price = 0, max_price = 100000):
+def boolean_search(product_types, min_price=0, max_price=100000):
     # 'serum,sun-protection'
     pt = product_types.split(",")
     # ['serum','sun-protection']
     product_types_after = "(" + str(pt)[1:-1] + ")"
     # ('serum', 'sun-protection')
 
-    keys = ["product_name", "product_brand", "price", "product_review", "product_type"]
+    keys = [
+        "product_name", "product_brand", "price", "product_review",
+        "product_type"
+    ]
 
     survey = f"SELECT * FROM korean_skincare WHERE LOWER( product_type ) IN {product_types_after} AND price BETWEEN {min_price} AND {max_price}"
 
@@ -225,11 +228,13 @@ def product_type_search():
     # print(bool_products.keys())
     cosine_products = {dic["product_name"]: dic for dic in cosine}
     # print(cosine_products.keys())
-    common_names = set(bool_products.keys()).intersection(set(cosine_products.keys()))
+    common_names = set(bool_products.keys()).intersection(
+        set(cosine_products.keys()))
     # print(common_names)
     result = [bool_products[name] for name in common_names]
     # print(result)
     return result
+
 
 # boolean = boolean_search("serum,sun protection", 0, 100)
 # print(boolean)

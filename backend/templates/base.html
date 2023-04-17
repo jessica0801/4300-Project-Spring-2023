@@ -32,29 +32,29 @@
                     <label for="serum">serum</label>
                     <input type="checkbox" id="mask" name="product_type" value="mask">
                     <label for="mask">mask</label>
-                    <input type="checkbox" id="sheet-mask" name="product_type" value="sheet-mask">
-                    <label for="sheet-mask">sheet-mask</label>
-                    <input type="checkbox" id="lip-treatment" name="product_type" value="lip-treatment">
-                    <label for="lip-treatment">lip-treatment</label>
-                    <input type="checkbox" id="eye-treatment" name="product_type" value="eye-treatment">
-                    <label for="eye-treatment">eye-treatment</label>
+                    <input type="checkbox" id="sheet-mask" name="product_type" value="sheet mask">
+                    <label for="sheet-mask">sheet mask</label>
+                    <input type="checkbox" id="lip-treatment" name="product_type" value="lip treatment">
+                    <label for="lip-treatment">lip treatment</label>
+                    <input type="checkbox" id="eye-treatment" name="product_type" value="eye treatment">
+                    <label for="eye-treatment">eye treatment</label>
                     <input type="checkbox" id="cleanser" name="product_type" value="cleanser">
                     <label for="cleanser">cleanser</label>
                     <input type="checkbox" id="toner" name="product_type" value="toner">
                     <label for="toner">toner</label>
                     <input type="checkbox" id="exfoliater" name="product_type" value="exfoliater">
                     <label for="exfoliater">exfoliater</label>
-                    <input type="checkbox" id="sun-protection" name="product_type" value="sun-protection">
-                    <label for="sun-protection">sun-protection</label>
+                    <input type="checkbox" id="sun-protection" name="product_type" value="sun protection">
+                    <label for="sun-protection">sun protection</label>
                     <input type="checkbox" id="essence" name="product_type" value="essence">
                     <label for="essence">essence</label>
-                    <input type="checkbox" id="other/spot-treatment" name="product_type" value="other/spot-treatment">
-                    <label for="other/spot-treatment">other/spot-treatment</label><br>
+                    <input type="checkbox" id="other/spot-treatment" name="product_type" value="other/spot treatment">
+                    <label for="other/spot-treatment">other/spot treatment</label><br>
                 </div>
 
                 <div class="slidecontainer">
                     <header>
-                        <p>Use slider or enter min and max price</p>
+                        <p>What price range?</p>
                     </header>
                     <div class="price-input">
                         <div class="field">
@@ -66,28 +66,28 @@
                             <span>Max</span>
                             <input type="number" class="input-max" value="150">
                         </div>
-                    <br>
-                    <!-- <div class="slider">
+                        <br>
+                        <!-- <div class="slider">
                         <div class="progress"></div>
                     </div>
                     <div class="range-input">
                         <input type="range" class="range-min" min="0" max="200" value="0" step="10">
                         <input type="range" class="range-max" min="0" max="200" value="150" step="10">
                     </div> -->
-                </div>
-                <div>
-                    <label for="keywords" class="form-label">Keywords</label>
-                    <input class="form-control" type="text" list="keywordOptions" id="keywords" 
-                    placeholder="Type to search...">
-                    <datalist id="keywordOptions">
-                        <option value="moisturizing">
-                        <option value="brightening">
-                        <option value="sunscreen">
-                        <option value="lotion">
-                        <option value="clean">
-                    </datalist>
-                </div>
-                <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
+                    </div>
+                    <div>
+                        <label for="keywords" class="form-label">Tell us more details...</label>
+                        <input class="form-control" type="text" list="keywordOptions" id="keywords"
+                            placeholder="Type to search...">
+                        <datalist id="keywordOptions">
+                            <option value="moisturizing">
+                            <option value="brightening">
+                            <option value="sunscreen">
+                            <option value="lotion">
+                            <option value="clean">
+                        </datalist>
+                    </div>
+                    <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
             </form>
         </div>
         <div id="answer-box"></div>
@@ -101,8 +101,8 @@
                             <h6 class="card-subtitle mb-2 text-body-secondary">${brand}</h6>
                             <p class="card-text">${description}</p>
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item">${type}</li>
-                                <li class="list-group-item">${price}</li>
+                                <li class="list-group-item">type: ${type}</li>
+                                <li class="list-group-item">price: ${price}</li>
                             </ul> 
                         </div>
                     </div>`
@@ -132,15 +132,14 @@
             fetch("/product-type?" + new URLSearchParams({ product_type: types, product_min_price: min_price, product_max_price: max_price, keywords: keywords }).toString())
                 .then((response) => response.json())
                 .then((data) =>
-                    console.log(data)
-                    // data.forEach(row => {
-                    //     let tempDiv = document.createElement("div")
-                    //     tempDiv.innerHTML = answerBoxTemplate(row.product_url, row.product_type)
-                    //     document.getElementById("answer-box").appendChild(tempDiv)
-                    // }
-                    // )
+                    data.forEach(row => {
+                        let tempDiv = document.createElement("div")
+                        tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_brand, row.price, row.product_review, row.product_type)
+                        document.getElementById("answer-box").appendChild(tempDiv)
+                    }
                     )
-                    ;
+                )
+                ;
         }
 
     </script>
