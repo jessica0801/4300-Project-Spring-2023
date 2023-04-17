@@ -1,5 +1,5 @@
 import csv
-import product_reviews from 'reviews.json'
+import 'reviews'
 
 field_names = ['product_id', 'review']
 
@@ -15,7 +15,7 @@ for review in product_reviews:
   else:
     pass 
 
-with open('product_reviews.csv', 'w') as csvfile:
+with open('product_reviews.csv', 'w',newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames = field_names)
     writer.writeheader()
     writer.writerows(reviews)
