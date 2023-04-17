@@ -1,5 +1,7 @@
+import csv
 import product_reviews from 'reviews.json'
-import pandas as pd
+
+field_names = ['product_id', 'review']
 
 reviews = {}
 counts = {}
@@ -13,5 +15,7 @@ for review in product_reviews:
   else:
     pass 
 
-df = pd.DataFrame(reviews)
-print(reviews)
+with open('product_reviews.csv', 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames = field_names)
+    writer.writeheader()
+    writer.writerows(reviews)
