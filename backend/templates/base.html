@@ -26,76 +26,70 @@
             <form class="form" id="form">
                 <p>What type of products are you looking for?</p>
                 <div class="checkbox">
-                    <input type="checkbox" id="moisturiser" name="product_type" value="moisturiser">
-                    <label for="moisturiser">moisturiser</label>
-                    <input type="checkbox" id="serum" name="product_type" value="serum">
-                    <label for="serum">serum</label>
-                    <input type="checkbox" id="mask" name="product_type" value="mask">
-                    <label for="mask">mask</label>
-                    <input type="checkbox" id="sheet-mask" name="product_type" value="sheet mask">
-                    <label for="sheet-mask">sheet mask</label>
-                    <input type="checkbox" id="lip-treatment" name="product_type" value="lip treatment">
-                    <label for="lip-treatment">lip treatment</label>
-                    <input type="checkbox" id="eye-treatment" name="product_type" value="eye treatment">
-                    <label for="eye-treatment">eye treatment</label>
-                    <input type="checkbox" id="cleanser" name="product_type" value="cleanser">
-                    <label for="cleanser">cleanser</label>
-                    <input type="checkbox" id="toner" name="product_type" value="toner">
-                    <label for="toner">toner</label>
-                    <input type="checkbox" id="exfoliater" name="product_type" value="exfoliater">
-                    <label for="exfoliater">exfoliater</label>
-                    <input type="checkbox" id="sun-protection" name="product_type" value="sun protection">
-                    <label for="sun-protection">sun protection</label>
-                    <input type="checkbox" id="essence" name="product_type" value="essence">
-                    <label for="essence">essence</label>
-                    <input type="checkbox" id="other/spot-treatment" name="product_type" value="other/spot treatment">
-                    <label for="other/spot-treatment">other/spot treatment</label><br>
+                    <label><input type="checkbox" id="moisturiser" name="product_type"
+                            value="moisturiser">moisturiser</label>
+                    <label><input type="checkbox" id="serum" name="product_type" value="serum">serum</label>
+                    <label><input type="checkbox" id="mask" name="product_type" value="mask">mask</label>
+                    <label><input type="checkbox" id="sheet-mask" name="product_type" value="sheet mask">sheet
+                        mask</label>
+                    <label><input type="checkbox" id="lip-treatment" name="product_type" value="lip treatment">lip
+                        treatment</label>
+                    <label><input type="checkbox" id="eye-treatment" name="product_type" value="eye treatment">eye
+                        treatment</label>
+                    <label><input type="checkbox" id="cleanser" name="product_type" value="cleanser">cleanser</label>
+                    <label><input type="checkbox" id="toner" name="product_type" value="toner">toner</label>
+                    <label><input type="checkbox" id="exfoliater" name="product_type"
+                            value="exfoliater">exfoliater</label>
+                    <label><input type="checkbox" id="sun-protection" name="product_type" value="sun protection">sun
+                        protection</label>
+                    <label><input type="checkbox" id="essence" name="product_type" value="essence">essence</label>
+                    <label><input type="checkbox" id="other/spot-treatment" name="product_type"
+                            value="other/spot treatment">other/spot treatment</label>
+                    <br><br>
                 </div>
 
                 <div class="slidecontainer">
-                    <header>
-                        <p>What price range?</p>
-                    </header>
+                    <p>What price range?</p>
                     <div class="price-input">
-                        <div class="field">
-                            <span>Min</span>
-                            <input type="number" class="input-min" value="0">
+                        <div class="form-floating">
+                            <input type="price" class="form-control" id="input-min" value="0">
+                            <label for="input-min">min</label>
                         </div>
                         <div class="separator">-</div>
-                        <div class="field">
-                            <span>Max</span>
-                            <input type="number" class="input-max" value="150">
+                        <div class="form-floating">
+                            <input type="price" id="input-max" class="form-control" value="150">
+                            <label for="input-max">max</label>
                         </div>
-                        <br>
+                        <br><br>
                         <!-- <div class="slider">
-                        <div class="progress"></div>
+                            <div class="progress"></div>
+                        </div> -->
+                        <!-- <div class="range-input">
+                            <input type="range" class="range-min" min="0" max="200" value="0" step="10">
+                            <input type="range" class="range-max" min="0" max="200" value="150" step="10">
+                        </div> -->
                     </div>
-                    <div class="range-input">
-                        <input type="range" class="range-min" min="0" max="200" value="0" step="10">
-                        <input type="range" class="range-max" min="0" max="200" value="150" step="10">
-                    </div> -->
-                    </div>
-                    <div>
-                        <label for="keywords" class="form-label">Tell us more details...</label>
-                        <input class="form-control" type="text" list="keywordOptions" id="keywords"
-                            placeholder="Type to search...">
-                        <datalist id="keywordOptions">
-                            <option value="moisturizing">
-                            <option value="brightening">
-                            <option value="sunscreen">
-                            <option value="lotion">
-                            <option value="clean">
-                        </datalist>
-                    </div>
-                    <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
+                </div>
+                <div class="mb-3">
+                    <label for="keywords" class="form-label">Tell us more about what you are looking for!</label>
+                    <textarea class="form-control" id="keywords" rows="3"></textarea>
+                </div>
+                <br><br>
+                <input class="button" type="button" name="submit" value="submit" onclick="sendForm()">
             </form>
         </div>
-        <div id="answer-box"></div>
+        <br><br>
+        <div id="answer-box">
+            <div class="answer-row" id="answer-row1"></div>
+            <div class="answer-row" id="answer-row2"></div>
+            <div class="answer-row" id="answer-row3"></div>
+        </div>
+
     </div>
 
     <script>
         function answerBoxTemplate(name, brand, price, description, type) {
-            return `<div class="card" style="width: 18rem;">
+            return `<div class="card">
                         <div class="card-body">
                             <h5 class="card-title">${name}</h5>
                             <h6 class="card-subtitle mb-2 text-body-secondary">${brand}</h6>
@@ -108,12 +102,24 @@
                     </div>`
         }
 
+        function buttonDisable() {
+            var product_types = document.getElementsByName('product_type').value;
+            var product = false;
+            for (i = 0; i < product_types.length; i++) {
+                products = product_types[i].checked;
+            }
+            var keywords = document.getElementById('keywords').value == undefined;
+
+            return product && keywords
+        }
+
         function sendForm() {
-            console.log('form sent')
+            console.log('form sent');
             var product_types = document.getElementsByName('product_type');
             var keywords = document.getElementById('keywords').value;
-            var min_price = "0";
-            var max_price = "150";
+            keywords = (keywords != undefined ? keywords : "none");
+            var min_price = document.getElementById('input-min').value;
+            var max_price = document.getElementById('input-max').value;
             var products = [];
 
             for (i = 0; i < product_types.length; i++) {
@@ -124,18 +130,27 @@
 
             // pass to python function to get results
             displayProducts(products, min_price, max_price, keywords)
+
         }
 
         function displayProducts(types, min_price, max_price, keywords) {
-            document.getElementById("answer-box").innerHTML = ""
-            console.log("/product_type?" + new URLSearchParams({ product_type: types, product_price: (min_price, max_price), keywords: keywords }).toString())
+            document.getElementById("answer-row1").innerHTML = ""
+            console.log("/product_type?" + new URLSearchParams({ product_type: types, product_min_price: min_price, product_max_price: max_price, keywords: keywords }).toString())
+            var i = 0;
             fetch("/product-type?" + new URLSearchParams({ product_type: types, product_min_price: min_price, product_max_price: max_price, keywords: keywords }).toString())
                 .then((response) => response.json())
                 .then((data) =>
                     data.forEach(row => {
                         let tempDiv = document.createElement("div")
                         tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_brand, row.price, row.product_review, row.product_type)
-                        document.getElementById("answer-box").appendChild(tempDiv)
+                        if (i < 3) {
+                            document.getElementById("answer-row1").appendChild(tempDiv);
+                        } else if (i < 6) {
+                            document.getElementById("answer-row2").appendChild(tempDiv);
+                        } else {
+                            document.getElementById("answer-row3").appendChild(tempDiv);
+                        }
+                        i++;
                     }
                     )
                 )
