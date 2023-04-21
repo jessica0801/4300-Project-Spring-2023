@@ -231,4 +231,4 @@ common_names = set(bool_products.keys()).intersection(set(cosine_products.keys()
 result = [bool_products[name] for name in common_names]
 # print(result)
 
-app.run(debug=True)
+# app.run(debug=True)
