@@ -250,4 +250,4 @@ def product_type_search():
 # result = [bool_products[name] for name in common_names]
 # print(result)
 
-app.run(debug=True)
+# app.run(debug=True)
