@@ -2,6 +2,7 @@ import json
 import os
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+import random
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
@@ -176,6 +177,7 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
             score = round(float(dots[doc]) / (qnorm * np.sum(doc_norms[doc])), 2)
         ans += [(score, doc)]
     ans.sort(key=lambda x: x[0], reverse=True)
+
     return ans
 
 
@@ -214,6 +216,9 @@ index_to_word = {i:t for t,i in word_to_index.items()}
 #     asort = np.argsort(-sims)[:k+1]
 #     print(asort)
 #     return [(products[i],sims[i]) for i in asort[1:]]
+def top_words(doc):
+    tokens = tokenize(doc)
+    return random.sample(tokens, 5)
 
 def cosine_sim(query):
     ans = []
@@ -223,14 +228,8 @@ def cosine_sim(query):
     # for _, id in index_search(query, inv_idx, idf, norms)[:10]:
     #     ans += [products[id]]
     # return json.dumps([dict(zip(keys, i)) for i in ans])
-
-    # for _, id in closest_projects(query, docs_compressed_normed)[:10]:
-    #     ans += [products[id]]
-    # return ans
-
-#old cosine
-    for _, id in index_search(query, inv_idx, idf, docs_compressed_normed)[:10]:
-        ans += [products[id]]
+    for _, id in index_search(query, inv_idx, idf, norms)[:10]:
+        ans += [products[id]] 
     return ans
 
 
@@ -256,9 +255,13 @@ def product_type_search():
     common_names = set(bool_products.keys()).intersection(
         set(cosine_products.keys()))
     # print(common_names)
+    
     result = [bool_products[name] for name in common_names]
+    top_keywords = []
+    for dic in result: 
+        top_keywords.append(top_words(dic["product_review"]))
     # print(result)
-    return result
+    return (result, top_keywords)
 
 
 # boolean = boolean_search("serum,sun protection", 0, 100)
