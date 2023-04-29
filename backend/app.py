@@ -1,13 +1,15 @@
 import json
 import os
 import numpy as np
-import ast
+from sklearn.feature_extraction.text import TfidfVectorizer
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 import math
 import re
 import string
+from scipy.sparse.linalg import svds
+from sklearn.preprocessing import normalize
 
 # ROOT_PATH for linking with all your files.
 # Feel free to use a config.py or settings.py with a global export variable
@@ -79,14 +81,7 @@ def boolean_search(product_types, min_price=0, max_price=100000):
     query = mysql_engine.query_selector(survey)
     return [dict(zip(keys, i)) for i in query]
 
-
-def tokenize(text):
-    """text is a string. tokenize(text) cleans the text and removes stopwords 
-    and punctuations.
-    returns: list of words"""
-    text = ''.join([word for word in text if word not in string.punctuation])
-    text = text.lower()
-    stopwords = [
+stopwords = [
         "ourselves", "hers", "between", "yourself", "but", "again", "there",
         "about", "once", "during", "out", "very", "having", "with", "they",
         "own", "an", "be", "some", "for", "do", "its", "yours", "such", "into",
@@ -103,6 +98,13 @@ def tokenize(text):
         "being", "if", "theirs", "my", "against", "a", "by", "doing", "it",
         "how", "further", "was", "here", "than"
     ]
+def tokenize(text):
+    """text is a string. tokenize(text) cleans the text and removes stopwords 
+    and punctuations.
+    returns: list of words"""
+    text = ''.join([word for word in text if word not in string.punctuation])
+    text = text.lower()
+
     text = ' '.join([word for word in text.split() if word not in stopwords])
     return re.findall("[A-Za-z]+", text)
 
@@ -171,7 +173,7 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
     for doc in range(len(doc_norms)):
         score = -1
         if doc in dots:
-            score = round(float(dots[doc]) / (qnorm * doc_norms[doc]), 2)
+            score = round(float(dots[doc]) / (qnorm * np.sum(doc_norms[doc])), 2)
         ans += [(score, doc)]
     ans.sort(key=lambda x: x[0], reverse=True)
     return ans
@@ -195,6 +197,23 @@ idf = compute_idf(inv_idx, len(products), 10, 0.1)
 inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
 norms = compute_norms(inv_idx, idf, len(products))
 
+vectorizer = TfidfVectorizer(stop_words = stopwords, max_df = .7,
+                            min_df = 75)
+td_matrix = vectorizer.fit_transform([x['product_review'] for x in products])
+
+u,s,v_trans = svds(td_matrix, k=10)
+docs_compressed, s, words_compressed = svds(td_matrix, k=10)
+docs_compressed_normed = normalize(docs_compressed)
+print(docs_compressed_normed)
+word_to_index = vectorizer.vocabulary_
+index_to_word = {i:t for t,i in word_to_index.items()}
+
+# words_compressed_normed = normalize(words_compressed, axis = 1)
+# def closest_projects(project_index_in, project_repr_in, k = 5):
+#     sims = project_repr_in.dot(project_repr_in[project_index_in,:])
+#     asort = np.argsort(-sims)[:k+1]
+#     print(asort)
+#     return [(products[i],sims[i]) for i in asort[1:]]
 
 def cosine_sim(query):
     ans = []
@@ -204,7 +223,13 @@ def cosine_sim(query):
     # for _, id in index_search(query, inv_idx, idf, norms)[:10]:
     #     ans += [products[id]]
     # return json.dumps([dict(zip(keys, i)) for i in ans])
-    for _, id in index_search(query, inv_idx, idf, norms)[:10]:
+
+    # for _, id in closest_projects(query, docs_compressed_normed)[:10]:
+    #     ans += [products[id]]
+    # return ans
+
+#old cosine
+    for _, id in index_search(query, inv_idx, idf, docs_compressed_normed)[:10]:
         ans += [products[id]]
     return ans
 
