@@ -82,23 +82,25 @@ def boolean_search(product_types, min_price=0, max_price=100000):
     query = mysql_engine.query_selector(survey)
     return [dict(zip(keys, i)) for i in query]
 
+
 stopwords = [
-        "ourselves", "hers", "between", "yourself", "but", "again", "there",
-        "about", "once", "during", "out", "very", "having", "with", "they",
-        "own", "an", "be", "some", "for", "do", "its", "yours", "such", "into",
-        "of", "most", "itself", "other", "off", "is", "s", "am", "or", "who",
-        "as", "from", "him", "each", "the", "themselves", "until", "below",
-        "are", "we", "these", "your", "his", "through", "don", "nor", "me",
-        "were", "her", "more", "himself", "this", "down", "should", "our",
-        "their", "while", "above", "both", "up", "to", "ours", "had", "she",
-        "all", "no", "when", "at", "any", "before", "them", "same", "and",
-        "been", "have", "in", "will", "on", "does", "yourselves", "then",
-        "that", "because", "what", "over", "why", "so", "can", "did", "not",
-        "now", "under", "he", "you", "herself", "has", "just", "where", "too",
-        "only", "myself", "which", "those", "i", "after", "few", "whom", "t",
-        "being", "if", "theirs", "my", "against", "a", "by", "doing", "it",
-        "how", "further", "was", "here", "than"
-    ]
+    "ourselves", "hers", "between", "yourself", "but", "again", "there",
+    "about", "once", "during", "out", "very", "having", "with", "they", "own",
+    "an", "be", "some", "for", "do", "its", "yours", "such", "into", "of",
+    "most", "itself", "other", "off", "is", "s", "am", "or", "who", "as",
+    "from", "him", "each", "the", "themselves", "until", "below", "are", "we",
+    "these", "your", "his", "through", "don", "nor", "me", "were", "her",
+    "more", "himself", "this", "down", "should", "our", "their", "while",
+    "above", "both", "up", "to", "ours", "had", "she", "all", "no", "when",
+    "at", "any", "before", "them", "same", "and", "been", "have", "in", "will",
+    "on", "does", "yourselves", "then", "that", "because", "what", "over",
+    "why", "so", "can", "did", "not", "now", "under", "he", "you", "herself",
+    "has", "just", "where", "too", "only", "myself", "which", "those", "i",
+    "after", "few", "whom", "t", "being", "if", "theirs", "my", "against", "a",
+    "by", "doing", "it", "how", "further", "was", "here", "than"
+]
+
+
 def tokenize(text):
     """text is a string. tokenize(text) cleans the text and removes stopwords 
     and punctuations.
@@ -174,7 +176,8 @@ def index_search(query, index, idf, doc_norms, score_func=acc_dot_scores):
     for doc in range(len(doc_norms)):
         score = -1
         if doc in dots:
-            score = round(float(dots[doc]) / (qnorm * np.sum(doc_norms[doc])), 2)
+            score = round(
+                float(dots[doc]) / (qnorm * np.sum(doc_norms[doc])), 2)
         ans += [(score, doc)]
     ans.sort(key=lambda x: x[0], reverse=True)
 
@@ -199,16 +202,16 @@ idf = compute_idf(inv_idx, len(products), 10, 0.1)
 inv_idx = {key: val for key, val in inv_idx.items() if key in idf}
 norms = compute_norms(inv_idx, idf, len(products))
 
-vectorizer = TfidfVectorizer(stop_words = stopwords, max_df = .7,
-                            min_df = 75)
+vectorizer = TfidfVectorizer(stop_words=stopwords, max_df=.7, min_df=75)
 td_matrix = vectorizer.fit_transform([x['product_review'] for x in products])
 
-u,s,v_trans = svds(td_matrix, k=10)
+u, s, v_trans = svds(td_matrix, k=10)
 docs_compressed, s, words_compressed = svds(td_matrix, k=10)
 docs_compressed_normed = normalize(docs_compressed)
-print(docs_compressed_normed)
+# print(docs_compressed_normed)
 word_to_index = vectorizer.vocabulary_
-index_to_word = {i:t for t,i in word_to_index.items()}
+index_to_word = {i: t for t, i in word_to_index.items()}
+
 
 # words_compressed_normed = normalize(words_compressed, axis = 1)
 # def closest_projects(project_index_in, project_repr_in, k = 5):
@@ -220,6 +223,7 @@ def top_words(doc):
     tokens = tokenize(doc)
     return random.sample(tokens, 5)
 
+
 def cosine_sim(query):
     ans = []
     # keys = [
@@ -229,7 +233,7 @@ def cosine_sim(query):
     #     ans += [products[id]]
     # return json.dumps([dict(zip(keys, i)) for i in ans])
     for _, id in index_search(query, inv_idx, idf, norms)[:10]:
-        ans += [products[id]] 
+        ans += [products[id]]
     return ans
 
 
@@ -244,24 +248,21 @@ def product_type_search():
     min_price = request.args.get("product_min_price")
     max_price = request.args.get("product_max_price")
     boolean = boolean_search(product_type, min_price, max_price)
-    # print(boolean)
     keywords = request.args.get("keywords")
     cosine = cosine_sim(keywords)
 
     bool_products = {dic["product_name"]: dic for dic in boolean}
-    # print(bool_products.keys())
     cosine_products = {dic["product_name"]: dic for dic in cosine}
-    # print(cosine_products.keys())
     common_names = set(bool_products.keys()).intersection(
         set(cosine_products.keys()))
-    # print(common_names)
-    
-    result = [bool_products[name] for name in common_names]
+
+    products = [bool_products[name] for name in common_names]
     top_keywords = []
-    for dic in result: 
+    for dic in products:
         top_keywords.append(top_words(dic["product_review"]))
-    # print(result)
-    return (result, top_keywords)
+
+    result = {"product_list": products, "words": top_keywords}
+    return result
 
 
 # boolean = boolean_search("serum,sun protection", 0, 100)
