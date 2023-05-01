@@ -83,29 +83,19 @@
     </div>
 
     <script>
-        function answerBoxTemplate(name, brand, price, description, type, i) {
-            return `<div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">${i + 1}: ${name}</h5>
-                            <h6 class="card-subtitle mb-2 text-body-secondary">${brand}</h6>
-                            <p class="card-text">${description}</p>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">type: ${type}</li>
-                                <li class="list-group-item">price: ${price}</li>
-                            </ul> 
-                        </div>
-                    </div>`
-        }
+        let input = document.getElementById("keywords");
+        let button = document.querySelector(".button");
 
-        function buttonDisable() {
-            var product_types = document.getElementsByName('product_type').value;
-            var product = false;
-            for (i = 0; i < product_types.length; i++) {
-                products = product_types[i].checked;
+        button.disabled = true; //setting button state to disabled
+
+        input.addEventListener("change", stateHandle);
+
+        function stateHandle() {
+            if (document.getElementById("keywords").value === "") {
+                button.disabled = true; //button remains disabled
+            } else {
+                button.disabled = false; //button is enabled
             }
-            var keywords = document.getElementById('keywords').value == undefined;
-
-            return product && keywords
         }
 
         function sendForm() {
@@ -128,8 +118,24 @@
 
         }
 
+        function answerBoxTemplate(name, brand, price, description, type, i) {
+            return `<div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${i + 1}: ${name}</h5>
+                            <h6 class="card-subtitle mb-2 text-body-secondary">${brand}</h6>
+                            <p class="card-text">${description}</p>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">type: ${type}</li>
+                                <li class="list-group-item">price: ${price}</li>
+                            </ul> 
+                        </div>
+                    </div>`
+        }
+
         function displayProducts(types, min_price, max_price, keywords) {
             document.getElementById("answer-row1").innerHTML = ""
+            document.getElementById("answer-row2").innerHTML = ""
+            document.getElementById("answer-row3").innerHTML = ""
 
             console.log("/product_type?" + new URLSearchParams({ product_type: types, product_min_price: min_price, product_max_price: max_price, keywords: keywords }).toString())
             var i = 0;
@@ -146,17 +152,37 @@
                         description += data["words"][i][4]
                         tempDiv.innerHTML = answerBoxTemplate(row.product_name, row.product_brand, row.price, description, row.product_type, i)
                         if (i < 3) {
-                            document.getElementById("answer-row1").appendChild(tempDiv);
+                            let element = document.getElementById("answer-row1");
+                            while (element.firstChild && i == 0) {
+                                element.removeChild(element.firstChild);
+                            }
+                            element.appendChild(tempDiv);
                         } else if (i < 6) {
-                            document.getElementById("answer-row2").appendChild(tempDiv);
+                            let element = document.getElementById("answer-row2");
+                            while (element.firstChild && i == 3) {
+                                element.removeChild(element.firstChild);
+                            }
+                            element.appendChild(tempDiv);
                         } else {
-                            document.getElementById("answer-row3").appendChild(tempDiv);
+                            let element = document.getElementById("answer-row3");
+                            while (element.firstChild && i == 6) {
+                                element.removeChild(element.firstChild);
+                            }
+                            element.appendChild(tempDiv);
                         }
                         i++;
                     }
                     )
                 )
                 ;
+
+            if (i == 0) {
+                let alertDiv = document.createElement("div")
+                alertDiv.innerHTML = `<div class="alert alert-info" role="alert">
+                                        Unfortunately, there are no result. Try another search out!
+                                    </div>`
+                document.getElementById("answer-row1").appendChild(alertDiv);
+            }
         }
 
     </script>
